@@ -58,7 +58,6 @@ rule token = parse
 | "True"   { BLIT(true)  }
 | "False"  { BLIT(false) }
 | "class"  { CLASS } 
-| "void"   { VOID }
 | "List"   { LIST }
 | "None"   { NONE }
 (* Function *)

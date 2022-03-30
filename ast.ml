@@ -1,8 +1,8 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Equal | Neq | Less | And | Or
+type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | In
 
-type typ = Int | Bool
+type typ = Int | Bool | Float | Char | Class | List | None
 
 type expr =
     Literal of int
@@ -10,16 +10,22 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Assign of string * expr
+  (* For ID within ID *)
+  | Within of string * string
   (* function call *)
   | Call of string * expr list
 
 type stmt =
     Block of stmt list
   | Expr of expr
-  | If of expr * stmt * stmt
+  | If of expr * elif_stmt * stmt
   | While of expr * stmt
-  (* return *)
+  | For of expr * expr * expr * stmt 
+  | For_within of expr * expr * stmt (* For X within Y *)
   | Return of expr
+  and 
+  elif_stmt =  
+    | Elif of stmt * expr * elif_stmt
 
 (* int x: name binding *)
 type bind = typ * string
@@ -33,7 +39,9 @@ type func_def = {
   body: stmt list;
 }
 
-type program = bind list * func_def list
+type program = 
+  locals: bind list;
+  body: stmt list;
 
 (* Pretty-printing functions *)
 let string_of_op = function
