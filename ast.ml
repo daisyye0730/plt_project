@@ -23,8 +23,7 @@ type stmt =
   | For of expr * expr * expr * stmt 
   | For_within of expr * expr * stmt (* For X within Y *)
   | Return of expr
-  and 
-  elif_stmt =  
+  and elif_stmt =  
     | Elif of stmt * expr * elif_stmt
 
 (* int x: name binding *)
