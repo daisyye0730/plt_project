@@ -1,4 +1,18 @@
+int a;
 int gcd () {
-    int a;
-    a = 3;
+    char c;
+    int i;
+    if (a == b) {
+        c = 5;
+    } else {
+        if (c == d) {
+            c = 6;
+        } else {
+
+        }
+    }
+
+    for (i = 0; i < 6; i++) {
+        c = 5;
+    }
 }

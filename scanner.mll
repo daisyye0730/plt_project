@@ -37,6 +37,10 @@ rule token = parse
 | "<="     { LEQ } 
 | ">"      { GT } 
 | ">="     { GEQ } 
+| "++"     { PLUSPLUS }
+| "--"     { MINUSMINUS }
+| "+="     { PLUSEQ }
+| "-="     { MINUSEQ }
 | "and"    { AND } 
 | "or"     { OR } 
 | "in"     { IN }

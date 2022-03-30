@@ -5,9 +5,9 @@ open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA COLON DOT
-%token PLUS MINUS TIMES DIVIDE MODULO
+%token PLUS MINUS TIMES DIVIDE MODULO PLUSPLUS MINUSMINUS
 %token NOT
-%token ASSIGN
+%token ASSIGN MINUSEQ PLUSEQ
 %token EQ NEQ LT LEQ GT GEQ AND OR IN
 %token WITHIN BREAK CONTINUE IF ELSE ELIF FOR WHILE 
 %token INT FLOAT BOOL CHAR CLASS LIST NONE
@@ -76,6 +76,10 @@ expr:
   | expr LEQ    expr { Binop($1, Leq,   $3)   }
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
   | expr IN     expr { Binop($1, In,    $3)   } 
+  | ID PLUSPLUS    { Assign($1, Binop(Id($1), Add, Int_Literal(1))) }
+  | ID MINUSMINUS  { Assign($1, Binop(Id($1), Sub, Int_Literal(1))) }
+  | ID PLUSEQ expr { Assign($1, Binop(Id($1), Add, $3)) }
+  | ID MINUSEQ expr { Assign($1, Binop(Id($1), Sub, $3)) }
   | ID   WITHIN ID   { Within($1, $3)         }
   | ID   ASSIGN expr { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
@@ -86,22 +90,22 @@ stmt_list:
   { [] }
   |stmt stmt_list { $1 :: $2 } 
 
-if_stmt: 
-  IF LPAREN expr RPAREN stmt { If ($3, $5, [], []) }
-| IF LPAREN expr RPAREN stmt ELSE stmt { If ($3, List.rev $6, [], List.rev $12) }
-| IF LPAREN expr RPAREN stmt elif_stmt ELSE stmt { If ($2, List.rev $6, List.rev $8, List.rev $13) }
-| IF LPAREN expr RPAREN stmt elif_stmt { If ($2, List.rev $6, List.rev $8, []) }
+// if_stmt: 
+//   IF LPAREN expr RPAREN stmt { If ($3, $5, [], []) }
+// | IF LPAREN expr RPAREN stmt ELSE stmt { If ($3, List.rev $6, [], List.rev $12) }
+// | IF LPAREN expr RPAREN stmt elif_stmt ELSE stmt { If ($2, List.rev $6, List.rev $8, List.rev $13) }
+// | IF LPAREN expr RPAREN stmt elif_stmt { If ($2, List.rev $6, List.rev $8, []) }
 
-elif_stmt:
-    ELIF LPAREN expr RPAREN elif_stmt { Elif($1, $4, $6)}
-  | elif_stmt ELIF LPAREN expr RPAREN stmt { ($3, List.rev $7) :: $1 }
+// elif_stmt:
+//     ELIF LPAREN expr RPAREN elif_stmt { Elif($1, $4, $6)}
+//   | elif_stmt ELIF LPAREN expr RPAREN stmt { ($3, List.rev $7) :: $1 }
 
 stmt:
     expr SEMI                               { Expr $1      }
   | LBRACE stmt_list RBRACE                 { Block $2 }
   /* if (condition) { block1 } else { block2 } */
-  | if_stmt                                  { $1 }
-  // | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
+  // | if_stmt                                  { $1 }
+  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | WHILE LPAREN expr RPAREN stmt           { While ($3, $5)  }
   | FOR LPAREN expr SEMI expr SEMI expr RPAREN stmt { For ($3, $5, $7, $9) }
   /*for (number within mylist) {
