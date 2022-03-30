@@ -88,13 +88,13 @@ stmt_list:
   | stmt stmt_list { $1 :: $2 } 
 
 if_stmt: 
-  IF LPAREN expr RPAREN stmt elif_stmt ELSE stmt 
-        { If ({if_branch= ($3, $5); elif_branch=List.rev $6; else_branch=$8}) }
+  LBRACE IF LPAREN expr RPAREN stmt RBRACE elif_stmt LBRACE ELSE stmt RBRACE
+        { If ({if_branch= ($4, $6); elif_branch=List.rev $8; else_branch=$11}) }
 
 elif_stmt:
     { [] }
-  | ELIF LPAREN expr RPAREN stmt { [($3 , $5)] }
-  | elif_stmt ELIF LPAREN expr RPAREN stmt {($4 , $6) :: $1 }
+  | LBRACE ELIF LPAREN expr RPAREN stmt RBRACE { [($4 , $6)] }
+  | elif_stmt LBRACE ELIF LPAREN expr RPAREN stmt RBRACE {($5 , $7) :: $1 }
 
 stmt:
     expr SEMI                               { Expr $1      }
