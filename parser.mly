@@ -94,7 +94,7 @@ if_stmt:
 elif_stmt:
     { [] }
   | ELIF LPAREN expr RPAREN stmt { [($3 , $5)] }
-  | elif_stmt ELIF LPAREN expr RPAREN stmt {($4 , $6) :: $1 }
+  | elif_stmt LPAREN ELIF LPAREN expr RPAREN stmt RPAREN {($5 , $7) :: $1 }
 
 stmt:
     expr SEMI                               { Expr $1      }

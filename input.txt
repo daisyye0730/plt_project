@@ -4,15 +4,15 @@ int gcd () {
     int i;
     if (a == b) {
         c = 5;
-    } elif (a != b) {
+    } (elif (a != b) {
         c = 1;
-    }
-    elif (a != b) {
+    })
+    (elif (a != b) {
         c = 7;
-    }
-    elif (a == c) {
+    })
+    (elif (a == c) {
         a = 1;
-    }
+    })
     else {
         if (c == d) {
             c = 6;

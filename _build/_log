@@ -6,18 +6,15 @@ ocamldep.opt -modules ast.ml > ast.ml.depends # cached
 # Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o ast.cmo ast.ml # cached
 # Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
-ocamlyacc parser.mly
-+ ocamlyacc parser.mly
-1 rule never reduced
-1 shift/reduce conflict.
+ocamlyacc parser.mly # cached
 # Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
-ocamldep.opt -modules parser.mli > parser.mli.depends
+ocamldep.opt -modules parser.mli > parser.mli.depends # cached
+# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
+ocamlc.opt -c -o parser.cmi parser.mli # cached
 # Target: scanner.mll, tags: { extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet }
 ocamllex.opt -q scanner.mll # cached
 # Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
 ocamldep.opt -modules scanner.ml > scanner.ml.depends # cached
-# Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
-ocamlc.opt -c -o parser.cmi parser.mli
 # Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
 ocamlc.opt -c -o scanner.cmo scanner.ml # cached
 # Target: test.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet }
@@ -25,13 +22,13 @@ ocamlc.opt -c -o test.cmo test.ml # cached
 # Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
 ocamlopt.opt -c -o ast.cmx ast.ml # cached
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
-ocamldep.opt -modules parser.ml > parser.ml.depends
+ocamldep.opt -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
-ocamlopt.opt -c -o parser.cmx parser.ml
+ocamlopt.opt -c -o parser.cmx parser.ml # cached
 # Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
-ocamlopt.opt -c -o scanner.cmx scanner.ml
+ocamlopt.opt -c -o scanner.cmx scanner.ml # cached
 # Target: test.cmx, tags: { compile, extension:cmx, extension:ml, file:test.cmx, file:test.ml, implem, native, ocaml, quiet }
-ocamlopt.opt -c -o test.cmx test.ml
+ocamlopt.opt -c -o test.cmx test.ml # cached
 # Target: test.native, tags: { dont_link_with, extension:native, file:test.native, link, native, ocaml, program, quiet }
-ocamlopt.opt ast.cmx parser.cmx scanner.cmx test.cmx -o test.native
+ocamlopt.opt ast.cmx parser.cmx scanner.cmx test.cmx -o test.native # cached
 # Compilation successful.
