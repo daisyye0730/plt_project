@@ -74,7 +74,7 @@ rule token = parse
 
 and comment_block = parse
   "###" { token lexbuf }
-| _    { comment lexbuf }
+| _    { comment_block lexbuf }
 
 and comment = parse 
   "\n" { token lexbuf }

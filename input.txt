@@ -1,27 +1,28 @@
+###
+The GCD algorithm in MicroC
+hi 
+###
 int a;
-int gcd () {
-    char c;
-    int i;
-    if (a == b) {
-        c = 5;
-    } elif (a != b) {
-        c = 1;
-    }
-    (elif (a != b) {
-        c = 7;
-    })
-    (elif (a == c) {
-        a = 1;
-    })
-    else {
-        if (c == d) {
-            c = 6;
-        } else {
+int b;
 
-        }
-    }
+int gcd(int a, int b) {
+  while (a != b) {
+    if (b < a) a = a - b;
+    else b = b - a;
+  }
+  return a;
+}
 
-    for (i = 0; i < 6; i++) {
-        c = 5;
-    }
+int main() {
+  int x;
+  int y;
+  a = 18;
+  b = 9;
+  x = 2;
+  y = 14;
+  print(gcd(x,y));
+  print(gcd(3,15));
+  print(gcd(99,121));
+  print(gcd(a,b));
+  return 0;
 }
