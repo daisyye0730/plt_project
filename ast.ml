@@ -12,8 +12,6 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Assign of string * expr
-  (* For ID within ID *)
-  | Within of string * string
   (* function call *)
   | Call of string * expr list
 
@@ -22,19 +20,17 @@ type stmt =
     Block of stmt list
   | Expr of expr
   (* | If of expr * stmt * stmt *)
-  | If of if_record
+  | If of {
+    if_branch: expr * stmt;
+    elif_branch: (expr * stmt) list;
+    else_branch: stmt;
+  }
   | While of expr * stmt
   | For of expr * expr * expr * stmt 
   | For_within of expr * expr * stmt (* For X within Y *)
   | Return of expr
   | Break 
   | Continue
-  and if_record = 
-    {
-        if_branch: expr * stmt;
-        elif_branch: (expr * stmt) list;
-        else_branch: stmt;
-    }
 
 (* int x: name binding *)
 type bind = typ * string
@@ -79,7 +75,6 @@ let rec string_of_expr = function
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-  | Within(id1, id2) -> "(" ^ id1 ^ " within " ^ id2 ^ ")"
 
 let rec string_of_stmt = function
     Block(stmts) ->
