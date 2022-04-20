@@ -65,8 +65,13 @@ let check (globals, functions) =
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
-    let check_assign lvaluet rvaluet err =
-      if lvaluet = rvaluet then lvaluet else raise (Failure err)
+    let rec check_assign lvaluet rvaluet e err =
+      match lvaluet with 
+      | List(t, len) -> (match e with
+        | SListLit l ->
+          if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
+        | _ -> raise (Failure "only list type"))
+      | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in
 
     (* Build local symbol table of variables for this function *)
@@ -89,10 +94,11 @@ let check (globals, functions) =
       | ListLit l -> let li = List.rev (List.fold_left (fun r e -> check_expr e::r) [] l) 
                       in let re = List.fold_left (fun r e -> 
                         match li with
+                           [] -> None (* when the list is empty, default type is None *)
                           |hd :: tl -> if (fst hd != fst e) then 
-                              raise (Failure ("List elements not uniform")) else fst e
-                        Int li)  
-                      in (re, SListLit l)
+                              raise (Failure ("List elements not uniform")) else fst e)
+                        Int li  
+                      in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
@@ -100,7 +106,7 @@ let check (globals, functions) =
         let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
-        (check_assign lt rt err, SAssign(var, (rt, e')))
+        (check_assign lt rt e' err, SAssign(var, (lt, e')))
 
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
@@ -134,7 +140,7 @@ let check (globals, functions) =
                let (et, e') = check_expr e in
                let err = "illegal argument found " ^ string_of_typ et ^
                          " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
-               in (check_assign ft et err, e')
+               in (check_assign ft et e' err, e') (*note check_assign is changed*)
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.rtyp, SCall(fname, args'))
