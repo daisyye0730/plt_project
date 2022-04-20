@@ -16,8 +16,8 @@ int gcd(int a, int b) {
 int main() {
   int x;
   int y;
-  List(bool, 5) new_list;
-  new_list = [a or b, a or b, a and b];
+  List(int, 5) new_list;
+  new_list = [4, 4.5];
   a = 18;
   b = 9;
   x = 2;
