@@ -2,13 +2,14 @@
 
 type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | In | Leq | Geq
 
-type typ = Int | Bool | Float | Char | Class | List | None
+type typ = Int | Bool | Float | Char | Class | List of typ * int | None
 
 type expr =
     Int_Literal of int
   | Float_Literal of float 
   | Char_Literal of char 
   | BoolLit of bool
+  | ListLit of expr list
   | Id of string
   | Binop of expr * op * expr
   | Assign of string * expr
@@ -73,8 +74,10 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | ListLit(l) -> "[" ^ (List.fold_left (fun r e -> r ^ ", " ^ string_of_expr e) "" l) ^ " ]"
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -93,13 +96,13 @@ let rec string_of_stmt = function
   | For_within(e1, e2, s1) -> "For (" ^ string_of_expr e1 ^ "within " 
       ^ string_of_expr e2 ^ ")\n" ^ string_of_stmt s1
 
-let string_of_typ = function
+let rec string_of_typ = function
     Int -> "int"
   | Bool -> "bool"
   | Float -> "float"
   | Char -> "char"
   | Class -> "class"
-  | List -> "List"
+  | List (typ, integer) -> "List(" ^ string_of_typ typ ^ ", " ^ string_of_int integer ^ ")"
   | None -> "None"
 
 let string_of_vdecl (t, id) = string_of_typ t ^ " " ^ id ^ ";\n"

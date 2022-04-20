@@ -10,8 +10,8 @@ open Ast
 %token ASSIGN MINUSEQ PLUSEQ
 %token EQ NEQ LT LEQ GT GEQ AND OR IN
 %token WITHIN BREAK CONTINUE IF ELSE ELIF FOR WHILE 
-%token INT FLOAT BOOL CHAR CLASS LIST NONE
-%token RETURN DEF
+%token INT FLOAT BOOL CHAR LIST NONE
+%token RETURN DEF CLASS
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
 %token <char> CHAR_LITERAL
@@ -53,8 +53,8 @@ typ:
   | FLOAT  { Float } 
   | CHAR   { Char } 
   | CLASS  { Class } 
-  | LIST   { List }
-  | NONE  { None }
+  | LIST LPAREN typ COMMA INT_LITERAL RPAREN  { List($3, $5) } // this will be a type List (int, 4) 
+  | NONE  { None }     
 
 expr:
     INT_LITERAL      { Int_Literal($1)        }
@@ -75,13 +75,21 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | expr LEQ    expr { Binop($1, Leq,   $3)   }
   | expr GEQ    expr { Binop($1, Geq,   $3)   }
-  //| expr IN     expr { Binop($1, In,    $3)   } 
   | ID PLUSPLUS    { Assign($1, Binop(Id($1), Add, Int_Literal(1))) }
   | ID MINUSMINUS  { Assign($1, Binop(Id($1), Sub, Int_Literal(1))) }
-  | ID   ASSIGN expr { Assign($1, $3)         }
+  | ID ASSIGN expr { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
+  | LBRACKET content_opt RBRACKET {  ListLit($2)      } // [2,3,4]
   /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
+
+content_opt:
+  /*nothing*/ { [] }
+  | content_list { $1 }
+
+content_list: 
+  expr {[$1]}
+  | expr COMMA content_list {$1::$3}
 
 stmt_list: 
   { [] }
@@ -106,6 +114,7 @@ stmt:
   | RETURN expr SEMI                        { Return $2      }
   | BREAK SEMI                              { Break  }
   | CONTINUE SEMI                           { Continue }
+  // | LIST LPAREN pair RPAREN ID SEMI         { List($3, $5) }
 
 
 /* fdecl */
