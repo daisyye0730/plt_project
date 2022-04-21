@@ -107,9 +107,6 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt e' err, SAssign(var, (lt, e')))
-      | Access(id, e) as ex ->
-        (* check that id exists as a list *)
-        (* check that length of list is longer than e *)
 
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
