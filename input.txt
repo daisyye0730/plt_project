@@ -16,9 +16,10 @@ int gcd(int a, int b) {
 int main() {
   int x;
   int y;
-  List(int, 4) new_list;
-  new_list = [3, 2, 2, 2];
-  x = new_list[3];
+  float z;
+  List(float, 4) new_list;
+  new_list = [3.5, 2.0, 4.7, 2.2];
+  z = new_list[2];
   a = 18;
   b = 9;
   x = 2;

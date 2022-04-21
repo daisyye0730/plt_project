@@ -82,9 +82,10 @@ let check (globals, functions) =
         | SListLit l ->
           if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
         | _ -> raise (Failure "only list type"))
-      | _ -> (match rvaluet with 
+      (* | _ -> (match rvaluet with 
         | List(t, len) -> if lvaluet = t then lvaluet else raise (Failure err)
-        | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err))
+        | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err)) *)
+      | _ -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
     in
 
     (* Return a semantically-checked expression, i.e., with a type *)
@@ -153,7 +154,7 @@ let check (globals, functions) =
         in match id_type with 
         | List(ty, len) -> (match e with 
           | (t, value) -> match value with 
-            | SInt_Literal(index) -> if index >= len then raise(Failure("index out of range")) else t)
+            | SInt_Literal(index) -> if index >= len then raise(Failure("index out of range")) else ty)
         | _ -> raise(Failure("cannot access non-lists"))
     in
 
