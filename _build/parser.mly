@@ -56,6 +56,9 @@ typ:
   | LIST LPAREN typ COMMA INT_LITERAL RPAREN  { List($3, $5) } // this will be a type List (int, 4) 
   | NONE  { None }     
 
+list_index: 
+  | ID LBRACKET INT_LITERAL RBRACKET { Access($1, Int_Literal($3)) } //myList[0]
+
 expr:
     INT_LITERAL      { Int_Literal($1)        }
   | FLOAT_LITERAL    { Float_Literal($1)      }
@@ -81,7 +84,8 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   // list support 
   | LBRACKET content_opt RBRACKET {  ListLit($2)      } // [2,3,4]
-  | ID LBRACKET INT_LITERAL RBRACKET { Access($1, Int_Literal($3)) } //myList[0]
+  | ID ASSIGN list_index { Assign($1, $3) } // x = mylist[2]
+  | list_index ASSIGN expr { ListAssign($1, $3) }
   /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
 
