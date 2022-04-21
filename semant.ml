@@ -63,17 +63,6 @@ let check (globals, functions) =
     check_binds "formal" func.formals;
     check_binds "local" func.locals;
 
-    (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
-    let rec check_assign lvaluet rvaluet e err =
-      match lvaluet with 
-      | List(t, len) -> (match e with
-        | SListLit l ->
-          if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
-        | _ -> raise (Failure "only list type"))
-      | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in
-
     (* Build local symbol table of variables for this function *)
     let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
         StringMap.empty (globals @ func.formals @ func.locals )
@@ -83,6 +72,19 @@ let check (globals, functions) =
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    (* Raise an exception if the given rvalue type cannot be assigned to
+       the given lvalue type *)
+    let rec check_assign lvaluet rvaluet e err =
+      match lvaluet with 
+      | List(t, len) -> (match e with
+        | SListLit l ->
+          if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
+        | _ -> raise (Failure "only list type"))
+      | _ -> (match rvaluet with 
+        | List(t, len) -> if lvaluet = t then lvaluet else raise (Failure err)
+        | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err))
     in
 
     (* Return a semantically-checked expression, i.e., with a type *)
@@ -100,6 +102,7 @@ let check (globals, functions) =
                         Int li  
                       in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
+      | Access(id, e) as ex -> (check_access id (check_expr e), SAccess(id, check_expr e))
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
         and (rt, e') = check_expr e in
@@ -107,9 +110,6 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt e' err, SAssign(var, (lt, e')))
-      | Access(id, e) as ex ->
-        (* check that id exists as a list *)
-        (* check that length of list is longer than e *)
 
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
@@ -147,6 +147,14 @@ let check (globals, functions) =
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.rtyp, SCall(fname, args'))
+    and 
+    check_access id e = 
+      let id_type = type_of_identifier id 
+        in match id_type with 
+        | List(ty, len) -> (match e with 
+          | (t, value) -> match value with 
+            | SInt_Literal(index) -> if index >= len then raise(Failure("index out of range")) else t)
+        | _ -> raise(Failure("cannot access non-lists"))
     in
 
     let check_bool_expr e =

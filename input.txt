@@ -19,7 +19,6 @@ int main() {
   List(int, 4) new_list;
   new_list = [3, 2, 2, 2];
   x = new_list[3];
-  y = x > new_list[3];
   a = 18;
   b = 9;
   x = 2;
