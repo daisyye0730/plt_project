@@ -65,14 +65,12 @@ let check (globals, functions) =
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
-    let rec check_assign lvaluet rvaluet e' err =
+    let rec check_assign lvaluet rvaluet e err =
       match lvaluet with 
-      | List(t, len) -> (match t with 
-        | List(lval, l) -> let r = check_expr e'' in check_assign t (fst e'') (snd e'') err
-        | _ -> (match e' with
-          | SListLit l ->
+      | List(t, len) -> (match e with
+        | SListLit l ->
           if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
-          | _ -> raise (Failure "only list type")))
+        | _ -> raise (Failure "only list type"))
       | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in
 
@@ -93,14 +91,14 @@ let check (globals, functions) =
       | Float_Literal l ->  (Float, SFloat_Literal l)
       | Char_Literal l -> (Char, SChar_Literal l)
       | BoolLit l -> (Bool, SBoolLit l)
-      (* | ListLit l -> let li = List.rev (List.fold_left (fun r e -> check_expr e::r) [] l) 
-                      in let re = List.fold_left (fun (rt,count) e -> 
+      | ListLit l -> let li = List.rev (List.fold_left (fun r e -> check_expr e::r) [] l) 
+                      in let re = List.fold_left (fun r e -> 
                         match li with
                            [] -> None (* when the list is empty, default type is None *)
                           |hd :: tl -> if (fst hd != fst e) then 
-                              raise (Failure ("List elements not uniform")) else (fst e, count+1))
-                        (Int, 0) li  
-                      in (List re, SListLit li) *)
+                              raise (Failure ("List elements not uniform")) else fst e)
+                        Int li  
+                      in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
