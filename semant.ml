@@ -103,7 +103,15 @@ let check (globals, functions) =
                         Int li  
                       in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
-      | Access(id, e) as ex -> (check_access id (check_expr e), SAccess(id, check_expr e))
+      | Access(id, e) -> (check_access id (check_expr e), SAccess(id, check_expr e))
+      | ListAssign(e1, e2) as ex -> 
+        let (lt, r1) = check_expr e1 
+        and (rt, r2) = check_expr e2 
+        in 
+        let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^
+                  string_of_typ rt ^ " in " ^ string_of_expr ex
+        in
+        (check_assign lt rt r2 err, SListAssign((lt, r1), (rt, r2)))
       | Assign(var, e) as ex ->
         let lt = type_of_identifier var
         and (rt, e') = check_expr e in

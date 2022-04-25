@@ -12,6 +12,7 @@ and sx =
   | SId of string
   | SBinop of sexpr * op * sexpr
   | SAssign of string * sexpr
+  | SListAssign of sexpr * sexpr 
   | SAccess of string * sexpr
   (* call *)
   | SCall of string * sexpr list
@@ -58,6 +59,7 @@ let rec string_of_sexpr (t, e) =
       | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
       | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
+      | SListAssign (e1, e2) -> string_of_sexpr e1 ^ "=" ^ string_of_sexpr e2
       | SAccess(id, e) -> id ^ "[" ^ string_of_sexpr e ^ "]"
       | SListLit(l) -> "[" ^ (List.fold_left (fun r e -> r ^ ", " ^ string_of_sexpr e) "" l) ^ " ]"
       | SCall(f, el) ->
