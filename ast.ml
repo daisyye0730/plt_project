@@ -13,7 +13,7 @@ type expr =
   | Id of string
   | Binop of expr * op * expr
   | Assign of string * expr
-  | ListAssign of expr * expr
+  | ListAssign of expr * expr 
   | Access of string * expr 
   (* function call *)
   | Call of string * expr list
@@ -76,7 +76,7 @@ let rec string_of_expr = function
   | Binop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | ListAssign (e1, e2) -> string_of_expr e1 ^ "=" ^ string_of_expr e2
+  | ListAssign (expr, e) -> string_of_expr expr ^ "=" ^ string_of_expr e
   | Access(id, e) -> id ^ "[" ^ string_of_expr e ^ "]"
   | ListLit(l) -> "[" ^ (List.fold_left (fun r e -> r ^ ", " ^ string_of_expr e) "" l) ^ " ]"
   | Call(f, el) ->
