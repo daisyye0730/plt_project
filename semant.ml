@@ -82,6 +82,7 @@ let check (globals, functions) =
         | SListLit l ->
           if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
         | SSlice(id, idx1, idx2) -> if (idx2-idx1) = len && lvaluet = rvaluet then rvaluet else raise (Failure err)
+        | SBinop(e1, op, e2) -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
         | _ -> raise (Failure "only list type"))
       (* | _ -> (match rvaluet with 
         | List(t, len) -> if lvaluet = t then lvaluet else raise (Failure err)
@@ -140,14 +141,25 @@ let check (globals, functions) =
         if t1 = t2 then
           (* Determine expression type based on operator and operand types *)
           let t = match op with
-              Add | Sub | Times | Divide | Modulo when t1 = Int -> Int
+              Add | Sub | Times | Divide | Modulo -> (match t1 with
+                    Int -> Int 
+                    |Float -> Float 
+                    | List(ty, len) -> List(ty, len))
+            | Equal | Neq -> Bool
+            | Less | Greater | Leq | Geq -> (match t1 with
+                    Int -> Bool 
+                    | Float -> Bool 
+                    | List(ty, len) -> Bool)
+            | And | Or -> Bool
+            | _ -> raise (Failure err)
+              (* Add | Sub | Times | Divide | Modulo when t1 = Int -> Int
             | Add | Sub | Times | Divide | Modulo when t1 = Float -> Float
             | Equal | Neq -> Bool
             | Less | Greater | Leq | Geq when t1 = Int -> Bool
-            | Less | Greater | Leq | Geq when t1 = Float -> Bool
-            (* | In when t1 =  *)
+            | Less | Greater | Leq | Geq when t1 = Float -> Bool *)
+            (* | In when t1 = 
             | And | Or when t1 = Bool -> Bool
-            | _ -> raise (Failure err)
+            | _ -> raise (Failure err) *)
           in
           (t, SBinop((t1, e1'), op, (t2, e2')))
         else raise (Failure err)
