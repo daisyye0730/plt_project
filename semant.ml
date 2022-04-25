@@ -142,14 +142,15 @@ let check (globals, functions) =
           (* Determine expression type based on operator and operand types *)
           let t = match op with
               Add | Sub | Times | Divide | Modulo -> (match t1 with
-                    Int -> Int 
-                    |Float -> Float 
-                    | List(ty, len) -> List(ty, len))
+                      Int -> Int 
+                    | Float -> Float 
+                    (* cannot add/sub/times/divide/mod non-int and non-float lists *)
+                    | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
             | Equal | Neq -> Bool
             | Less | Greater | Leq | Geq -> (match t1 with
-                    Int -> Bool 
+                      Int -> Bool 
                     | Float -> Bool 
-                    | List(ty, len) -> Bool)
+                    | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
             | And | Or -> Bool
             | _ -> raise (Failure err)
               (* Add | Sub | Times | Divide | Modulo when t1 = Int -> Int
