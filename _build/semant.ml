@@ -81,6 +81,7 @@ let check (globals, functions) =
       | List(t, len) -> (match e with
         | SListLit l ->
           if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
+        | SSlice(id, idx1, idx2) -> if (idx2-idx1) = len && lvaluet = rvaluet then rvaluet else raise (Failure err)
         | _ -> raise (Failure "only list type"))
       (* | _ -> (match rvaluet with 
         | List(t, len) -> if lvaluet = t then lvaluet else raise (Failure err)
@@ -103,7 +104,7 @@ let check (globals, functions) =
                         Int li  
                       in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
-      | Access(id, e) -> (check_access id (check_expr e), SAccess(id, check_expr e))
+      | Access(id, idx) -> (check_access id idx, SAccess(id, idx))
       | ListAssign(e1, e2) as ex -> 
         let (lt, r1) = check_expr e1 
         and (rt, r2) = check_expr e2 
@@ -119,7 +120,15 @@ let check (globals, functions) =
                   string_of_typ rt ^ " in " ^ string_of_expr ex
         in
         (check_assign lt rt e' err, SAssign(var, (lt, e')))
-
+      | Slice(id, index1, index2) -> 
+        let lt = type_of_identifier id 
+        and err = "index out of range for slicing in " ^ id
+        in 
+        (match lt with 
+        | List(ty, integer) -> if index1 < 0 || index2 > integer then raise(Failure(err)) 
+          else if index1 = index2 then raise(Failure("beginning and end indices are the same. Use list indexing instead"))
+          else (List(ty, index2-index1), SSlice(id, index1, index2))
+        | _ -> raise(Failure("invalid")))
       | Binop(e1, op, e2) as e ->
         let (t1, e1') = check_expr e1
         and (t2, e2') = check_expr e2 in
@@ -157,12 +166,10 @@ let check (globals, functions) =
           let args' = List.map2 check_call fd.formals args
           in (fd.rtyp, SCall(fname, args'))
     and 
-    check_access id e = 
+    check_access id idx = 
       let id_type = type_of_identifier id 
         in match id_type with 
-        | List(ty, len) -> (match e with 
-          | (t, value) -> match value with 
-            | SInt_Literal(index) -> if index >= len then raise(Failure("index out of range")) else ty)
+        | List(ty, len) -> if idx >= len then raise(Failure("index out of range")) else ty
         | _ -> raise(Failure("cannot access non-lists"))
     in
 
