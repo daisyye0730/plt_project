@@ -17,7 +17,7 @@ int main() {
   int x;
   int y;
   float z;
-  string a;
+  string op;
   
   List(char, 5) str1;
 
@@ -30,7 +30,7 @@ int main() {
   
   List(bool, 3) boolLi;
 
-  a = "abc";
+  op = "abc";
   str1 = ['a', 'b', 'c', 'd', 'e'];
   boolLi = [x > y, x > y, x == y];
   new_list = [3.5, 2.0, 4.7, 2.2]; 

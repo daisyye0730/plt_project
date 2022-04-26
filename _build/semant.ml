@@ -84,9 +84,6 @@ let check (globals, functions) =
         | SSlice(id, idx1, idx2) -> if (idx2-idx1) = len && lvaluet = rvaluet then rvaluet else raise (Failure err)
         | SBinop(e1, op, e2) -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
         | _ -> raise (Failure "only list type"))
-      (* | _ -> (match rvaluet with 
-        | List(t, len) -> if lvaluet = t then lvaluet else raise (Failure err)
-        | _ -> if lvaluet = rvaluet then lvaluet else raise (Failure err)) *)
       | _ -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
     in
 
@@ -95,6 +92,7 @@ let check (globals, functions) =
         Int_Literal l -> (Int, SInt_Literal l)
       | Float_Literal l ->  (Float, SFloat_Literal l)
       | Char_Literal l -> (Char, SChar_Literal l)
+      | String_Literal s -> (String, SString_Literal s)
       | BoolLit l -> (Bool, SBoolLit l)
       | ListLit l -> let li = List.rev (List.fold_left (fun r e -> check_expr e::r) [] l) 
                       in let re = List.fold_left (fun r e -> 
@@ -173,7 +171,7 @@ let check (globals, functions) =
         else let check_call (ft, _) e =
                let (et, e') = check_expr e in
                let err = "illegal argument found " ^ string_of_typ et ^
-                         " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e
+                         " expected " ^ string_of_typ ft ^ " in " ^ string_of_expr e 
                in (check_assign ft et e' err, e') (*note check_assign is changed*)
           in
           let args' = List.map2 check_call fd.formals args
