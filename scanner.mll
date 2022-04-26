@@ -5,6 +5,7 @@ let digit = ['0'-'9']
 let float = (digit+) ['.'] digit+
 let letter = ['a'-'z' 'A'-'Z']
 let ascii = ([' '-'!' '#'-'[' ']'-'~'])
+let escape = '\\' ['\\' ''' '"' 'n' 'r' 't']
 let char = ''' ( ascii | digit ) '''
 
 rule token = parse
@@ -56,6 +57,7 @@ rule token = parse
 | "float"  { FLOAT } 
 | "bool"   { BOOL } 
 | "char"   { CHAR } 
+| "string" { STRING }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
 (* | "struct" { STRUCT }  *)
@@ -68,6 +70,7 @@ rule token = parse
 | digit+ as lem  { INT_LITERAL(int_of_string lem) }
 | float as lxm   { FLOAT_LITERAL(float_of_string lxm) }
 | char as lxm    { CHAR_LITERAL( String.get lxm 1 ) }
+| '"' ( (ascii | escape)* as s) '"'   { STRING_LITERAL(s) }
 | letter (digit | letter | '_')* as lem { ID(lem) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }

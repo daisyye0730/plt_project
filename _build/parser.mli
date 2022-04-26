@@ -43,11 +43,13 @@ type token =
   | CHAR
   | LIST
   | NONE
+  | STRING
   | RETURN
   | DEF
   | INT_LITERAL of (int)
   | FLOAT_LITERAL of (float)
   | CHAR_LITERAL of (char)
+  | STRING_LITERAL of (string)
   | BLIT of (bool)
   | ID of (string)
   | EOF

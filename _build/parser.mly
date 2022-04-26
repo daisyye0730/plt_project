@@ -10,11 +10,12 @@ open Ast
 %token ASSIGN MINUSEQ PLUSEQ
 %token EQ NEQ LT LEQ GT GEQ AND OR IN
 %token WITHIN BREAK CONTINUE IF ELSE ELIF FOR WHILE 
-%token INT FLOAT BOOL CHAR LIST NONE
+%token INT FLOAT BOOL CHAR LIST NONE STRING
 %token RETURN DEF
 %token <int> INT_LITERAL
 %token <float> FLOAT_LITERAL
 %token <char> CHAR_LITERAL
+%token <string> STRING_LITERAL
 %token <bool> BLIT
 %token <string> ID
 %token EOF
@@ -54,7 +55,8 @@ typ:
   | CHAR   { Char } 
   // | STRUCT  { STRUCT } 
   | LIST LPAREN typ COMMA INT_LITERAL RPAREN  { List($3, $5) } // this will be a type List (int, 4) 
-  | NONE  { None }     
+  | NONE  { None }  
+  | STRING { String } 
 
 list_index: 
   | ID LBRACKET INT_LITERAL RBRACKET { Access($1, $3) } //myList[0]
@@ -64,6 +66,7 @@ expr:
   | FLOAT_LITERAL    { Float_Literal($1)      }
   | CHAR_LITERAL     { Char_Literal($1)       }
   | BLIT             { BoolLit($1)            }
+  | STRING_LITERAL   { String_Literal($1)     }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
