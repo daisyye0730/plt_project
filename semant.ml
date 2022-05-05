@@ -212,7 +212,7 @@ let check (globals, functions) =
     }*)
       | If({if_branch = e1; elif_branch = e2; else_branch = e3}) -> 
           SIf({sif_branch = check_expr (fst e1), check_stmt (snd e1);
-             selif_branch = List.fold_left (fun li e -> (check_expr (fst e), check_stmt (snd e))::li) [] e2;
+             selif_branch = List.rev (List.fold_left (fun li e -> (check_expr (fst e), check_stmt (snd e))::li) [] e2);
              selse_branch = check_stmt e3})
       | While(e, st) -> SWhile(check_bool_expr e, check_stmt st)
       | Return e ->
