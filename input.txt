@@ -7,8 +7,15 @@ int b;
 
 int gcd(int a, int b) {
   while (a != b) {
-    if (b < a) a = a - b;
-    else b = b - a;
+    if (b < a) {
+      a = a - b; }
+    elif (b == a) {
+      a = a + b;
+    }
+    (elif (b < a) {
+      a = a * b;
+    })
+    else {b = b - a;}
   }
   return a;
 }
@@ -18,20 +25,21 @@ int main() {
   int y;
   float z;
   string op;
-  
-  List(char, 9) str1;
 
-  List(float, 7) new_list;
+  List(float, 4) new_list;
   List(float, 1) sublist;
   
   List(bool, 3) l1;
   List(bool, 3) l2;
-  List(bool, 3) sum;
+
+  List(int, 3) t1;
+  List(int, 3) t2;
+  List(int, 3) sum;
   
   List(bool, 3) boolLi;
 
+  sum = t1 + t2;
   op = "abc";
-  str1 = ['a', 'b', 'c', 'd', 'e'];
   boolLi = [x > y, x > y, x == y];
   new_list = [3.5, 2.0, 4.7, 2.2]; 
   z = new_list[2];

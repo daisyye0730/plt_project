@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | In | Leq | Geq
+type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | Leq | Geq
 
 type typ = Int | Bool | Float | Char | List of typ * int | None | String 
 

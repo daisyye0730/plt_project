@@ -52,7 +52,6 @@ let translate (globals, functions) =
       let init = match t with
         A.Int -> L.const_int (ltype_of_typ t) 0
       | A.Float -> L.const_float (ltype_of_typ t) 0.0
-      | A.Bool -> L.const_bool (ltype_of_typ t) 
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
@@ -184,9 +183,27 @@ let translate (globals, functions) =
 
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context end_bb *)
-      (* | Sif (if_r) -> let bool_val = build_expr builder fst(if_r.sif_branch) in  *)
+      | SIf (if_r) ->  
+        let bool_val = build_expr builder fst(if_r.sif_branch) in
+        let then_bb = L.append_block context "then" the_function in
+         ignore (build_stmt (L.builder_at_end context then_bb) snd(if_r.sif_branch));
+        (* create blocks for all elif branches *)
+        let count_elif = 0 in
+        List.fold_left (fun count_elif e -> 
+          let count_elif = count_elif + 1 in
+          let bool_val_elif = build_expr builder fst(e) in
+          let then_bb_elif = L.append_block context "then " ^ count_elif the_function in 
+          ignore (build_stmt (L.builder_at_end context then_bb_elif) snd(e));
+          ) builder if_r.selif_branch;
+        let end_bb = L.append_block context "if_end" the_function in 
+        let build_br_end = L.build_br end_bb in 
+        add_terminal (L.builder_at_end context then_bb) build_br_end;
+        ignore(L.build_cond_br bool_val then_bb else_bb builder);
+        L.builder_at_end context end_bb
+        (* add terminals to the end of all elif branches *)
+        
 
-      (* | SWhile (predicate, body) ->
+      | SWhile (predicate, body) ->
         let while_bb = L.append_block context "while" the_function in
         let build_br_while = L.build_br while_bb in (* partial function *)
         ignore (build_br_while builder);
@@ -199,7 +216,7 @@ let translate (globals, functions) =
         let end_bb = L.append_block context "while_end" the_function in
 
         ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
-        L.builder_at_end context end_bb *)
+        L.builder_at_end context end_bb
 
     in
     (* Build the code for each statement in the function *)
