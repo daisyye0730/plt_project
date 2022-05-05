@@ -58,10 +58,163 @@ File "irgen.ml", lines 110-144, characters 50-63:
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SListLit _|SListAssign (_, _)|SAccess (_, _)|SSlice (_, _, _))
-File "irgen.ml", line 187, characters 23-33:
-187 |         let bool_val = build_expr builder fst(if_r.sif_branch) in
-                             ^^^^^^^^^^
-Error: This function has type L.llbuilder -> Sast.sexpr -> L.llvalue
-       It is applied to too many arguments; maybe you forgot a `;'.
-Command exited with code 2.
-# Compilation unsuccessful.
+File "irgen.ml", lines 241-245, characters 10-31:
+241 | ..........List.fold_left (fun r e -> 
+242 |             let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in 
+243 |             ignore(L.build_cond_br bool_val builder_body_bb next_bb builder);
+244 |             e::r
+245 |           ) [] elif_li_complete.
+Warning 10 [non-unit-statement]: this expression should have type unit.
+File "irgen.ml", lines 249-254, characters 10-29:
+249 | ..........List.fold_left (fun r e -> 
+250 |             let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in
+251 |             ignore(add_terminal (L.builder_at_end context builder_body_bb) build_br_end);
+252 |             e::r
+253 |           )
+254 |           [] elif_li_complete.
+Warning 10 [non-unit-statement]: this expression should have type unit.
+File "irgen.ml", lines 159-255, characters 58-67:
+159 | ..........................................................function
+160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
+161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
+162 |       (* unconditional jump to break bb *)
+163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
+...
+252 |             e::r
+253 |           )
+254 |           [] elif_li_complete;
+255 |           (L.builder_at_end context end_bb, break_bb, continue_bb);
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SWhile (_, _)|SFor_within (_, _, _)|SFor (_, _, _, _))
+# Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmo scanner.ml
+# Target: semant.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
++ /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
+File "semant.ml", lines 142-146, characters 53-108:
+142 | .....................................................(match t1 with
+143 |                       Int -> Int 
+144 |                     | Float -> Float 
+145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
+146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", lines 148-151, characters 44-107:
+148 | ............................................(match t1 with
+149 |                       Int -> Bool 
+150 |                     | Float -> Bool 
+151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", line 153, characters 14-15:
+153 |             | _ -> raise (Failure err)
+                    ^
+Warning 11 [redundant-case]: this match case is unused.
+# Target: dinosaur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:dinosaur.cmo, file:dinosaur.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmo dinosaur.ml
+# Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o ast.cmx ast.ml
+# Target: sast.cmx, tags: { compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmx sast.ml
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules parser.ml > parser.ml.depends # cached
+# Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o parser.cmx parser.ml
+# Target: irgen.cmx, tags: { compile, extension:cmx, extension:ml, file:irgen.cmx, file:irgen.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
++ /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
+File "irgen.ml", lines 39-45, characters 21-23:
+39 | .....................function
+40 |       A.Int   -> i32_t
+41 |     | A.Float -> float_t
+42 |     | A.Bool  -> i1_t
+43 |     | A.Char -> i1_t
+44 |     | A.None -> void_t
+45 |     | A.String -> str_t
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+List (_, _)
+File "irgen.ml", lines 52-54, characters 17-53:
+52 | .................match t with
+53 |         A.Int -> L.const_int (ltype_of_typ t) 0
+54 |       | A.Float -> L.const_float (ltype_of_typ t) 0.0
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String|List (_, _))
+File "irgen.ml", lines 110-144, characters 50-63:
+110 | ..................................................match e with
+111 |         SInt_Literal(i)  -> L.const_int i32_t i
+112 |       | SFloat_Literal(f) -> L.const_float_of_string float_t f
+113 |       | SChar_Literal(c) -> L.const_int i8_t (Char.code c)
+114 |       | SString_Literal(str)-> L.build_global_stringptr str "STRINGLITERAL" builder
+...
+141 |         let (fdef, fdecl) = StringMap.find f function_decls in
+142 |         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
+143 |         let result = f ^ "_result" in
+144 |         L.build_call fdef (Array.of_list llargs) result builder
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SListLit _|SListAssign (_, _)|SAccess (_, _)|SSlice (_, _, _))
+File "irgen.ml", lines 241-245, characters 10-31:
+241 | ..........List.fold_left (fun r e -> 
+242 |             let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in 
+243 |             ignore(L.build_cond_br bool_val builder_body_bb next_bb builder);
+244 |             e::r
+245 |           ) [] elif_li_complete.
+Warning 10 [non-unit-statement]: this expression should have type unit.
+File "irgen.ml", lines 249-254, characters 10-29:
+249 | ..........List.fold_left (fun r e -> 
+250 |             let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in
+251 |             ignore(add_terminal (L.builder_at_end context builder_body_bb) build_br_end);
+252 |             e::r
+253 |           )
+254 |           [] elif_li_complete.
+Warning 10 [non-unit-statement]: this expression should have type unit.
+File "irgen.ml", lines 159-255, characters 58-67:
+159 | ..........................................................function
+160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
+161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
+162 |       (* unconditional jump to break bb *)
+163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
+...
+252 |             e::r
+253 |           )
+254 |           [] elif_li_complete;
+255 |           (L.builder_at_end context end_bb, break_bb, continue_bb);
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SWhile (_, _)|SFor_within (_, _, _)|SFor (_, _, _, _))
+# Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmx scanner.ml
+# Target: semant.cmx, tags: { compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
++ /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
+File "semant.ml", lines 142-146, characters 53-108:
+142 | .....................................................(match t1 with
+143 |                       Int -> Int 
+144 |                     | Float -> Float 
+145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
+146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", lines 148-151, characters 44-107:
+148 | ............................................(match t1 with
+149 |                       Int -> Bool 
+150 |                     | Float -> Bool 
+151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", line 153, characters 14-15:
+153 |             | _ -> raise (Failure err)
+                    ^
+Warning 11 [redundant-case]: this match case is unused.
+# Target: dinosaur.cmx, tags: { compile, extension:cmx, extension:ml, file:dinosaur.cmx, file:dinosaur.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmx dinosaur.ml
+# Target: dinosaur.native, tags: { dont_link_with, extension:native, file:dinosaur.native, link, native, ocaml, program, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -I /Users/daisyye/.opam/4.13.1/lib/llvm /Users/daisyye/.opam/4.13.1/lib/llvm/shared/llvm.cmxa ast.cmx sast.cmx irgen.cmx parser.cmx scanner.cmx semant.cmx dinosaur.cmx -o dinosaur.native
+# Compilation successful.

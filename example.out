@@ -4,7 +4,6 @@ source_filename = "dinosaur"
 @a = global i32 0
 @b = global i32 0
 @fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
-@STRINGLITERAL = private unnamed_addr constant [4 x i8] c"abc\00", align 1
 
 declare i32 @printf(i8*, ...)
 
@@ -12,21 +11,59 @@ define i32 @main() {
 entry:
   %x = alloca i32, align 4
   %y = alloca i32, align 4
-  %z = alloca i1, align 1
-  %str = alloca i8*, align 8
-  %sum = alloca i32, align 4
-  store i8* getelementptr inbounds ([4 x i8], [4 x i8]* @STRINGLITERAL, i32 0, i32 0), i8** %str, align 8
-  store i32 10, i32* %x, align 4
+  %z = alloca i32, align 4
+  store i32 3, i32* %x, align 4
   store i32 5, i32* %y, align 4
   %x1 = load i32, i32* %x, align 4
   %y2 = load i32, i32* %y, align 4
   %tmp = icmp sgt i32 %x1, %y2
-  store i1 %tmp, i1* %z, align 1
+  %x7 = load i32, i32* %x, align 4
+  %y8 = load i32, i32* %y, align 4
+  %tmp9 = icmp slt i32 %x7, %y8
+  %x15 = load i32, i32* %x, align 4
+  %y16 = load i32, i32* %y, align 4
+  %tmp17 = icmp eq i32 %x15, %y16
+  br i1 %tmp, label %L1_body, label %L2
+
+L1_body:                                          ; preds = %entry
   %x3 = load i32, i32* %x, align 4
   %y4 = load i32, i32* %y, align 4
-  %tmp5 = add i32 %x3, %y4
-  store i32 %tmp5, i32* %sum, align 4
-  %sum6 = load i32, i32* %sum, align 4
-  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %sum6)
+  %tmp5 = sub i32 %x3, %y4
+  store i32 %tmp5, i32* %z, align 4
+  %z6 = load i32, i32* %z, align 4
+  %printf = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %z6)
+  br label %L_end
+
+L2:                                               ; preds = %entry
+  br i1 %tmp9, label %L2_body, label %L3
+
+L2_body:                                          ; preds = %L2
+  %y10 = load i32, i32* %y, align 4
+  %x11 = load i32, i32* %x, align 4
+  %tmp12 = sub i32 %y10, %x11
+  store i32 %tmp12, i32* %z, align 4
+  %z13 = load i32, i32* %z, align 4
+  %printf14 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %z13)
+  br label %L_end
+
+L3:                                               ; preds = %L2
+  br i1 %tmp17, label %L3_body, label %L3_body23
+
+L3_body:                                          ; preds = %L3
+  %y18 = load i32, i32* %y, align 4
+  %x19 = load i32, i32* %x, align 4
+  %tmp20 = sub i32 %y18, %x19
+  store i32 %tmp20, i32* %z, align 4
+  %z21 = load i32, i32* %z, align 4
+  %printf22 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %z21)
+  br label %L_end
+
+L3_body23:                                        ; preds = %L3_body23, %L3
+  store i32 1, i32* %z, align 4
+  %z24 = load i32, i32* %z, align 4
+  %printf25 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %z24)
+  br i1 %tmp, label %L3_body23, label %L_end
+
+L_end:                                            ; preds = %L3_body, %L2_body, %L1_body, %L3_body23
   ret i32 0
 }

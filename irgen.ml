@@ -167,40 +167,92 @@ let translate (globals, functions) =
       | SContinue -> ignore(add_terminal builder(L.build_br continue_bb));
         let continue_bb = L.append_block context "after_continue" the_function in 
         let builder = L.builder_at_end context continue_bb in (builder, break_bb, continue_bb)
-      | SReturn e -> ignore(L.build_ret (build_expr builder e) builder); (builder, break_bb, continue_bb)
-      (* | SIf (predicate, then_stmt, else_stmt) ->
-        let bool_val = build_expr builder predicate in
+      | SReturn e -> ignore(L.build_ret (build_expr builder e) builder); (builder, break_bb, continue_bb)    
+        (* if(E1) {S1} elif(E2) {S2} elif(E3) {S3} else{S3} L_end: *)
+        (* three address code 
+        E1.code 
+        bz L2 E1.addr
+        -------------
+        L1_body: S1.code 
+        jmp L_end
+        -------------
+        L2: E2.code 
+        bz L3 E2.addr 
+        -------------
+        L2_body: S2.code 
+        jmp L_end
+        ------------
+        L3: E3.code 
+        bz L4 E3.addr
+        ------------
+        L3_body: S3.code 
+        jmp L_end
+        ------------
+        L4: L3.code 
+        jmp L_end 
+        ------------
+        L_end: *)
+        | SIf (if_r) -> 
+          (* construct if then-stmt *) 
+          let bool_val_1 = build_expr builder (fst(if_r.sif_branch)) in
+          let l1_body_bb = L.append_block context "L1_body" the_function in
+          let curr_builder = L.builder_at_end context l1_body_bb in
+          let then_stmt = snd(if_r.sif_branch) in
+          let (b, _, _) = build_stmt(curr_builder, break_bb, continue_bb) then_stmt in
+          ignore(b);
 
-        let then_bb = L.append_block context "then" the_function in
-        ignore (build_stmt (L.builder_at_end context then_bb) then_stmt);
-        let else_bb = L.append_block context "else" the_function in
-        ignore (build_stmt (L.builder_at_end context else_bb) else_stmt);
-
-        let end_bb = L.append_block context "if_end" the_function in
-        let build_br_end = L.build_br end_bb in (* partial function *)
-        add_terminal (L.builder_at_end context then_bb) build_br_end;
-        add_terminal (L.builder_at_end context else_bb) build_br_end;
-
-        ignore(L.build_cond_br bool_val then_bb else_bb builder);
-        L.builder_at_end context end_bb *)
-      | SIf (if_r) ->  
-        let bool_val = build_expr builder fst(if_r.sif_branch) in
-        let then_bb = L.append_block context "then" the_function in
-         ignore (build_stmt (L.builder_at_end context then_bb) snd(if_r.sif_branch));
-        (* create blocks for all elif branches *)
-        let count_elif = 0 in
-        List.fold_left (fun count_elif e -> 
-          let count_elif = count_elif + 1 in
-          let bool_val_elif = build_expr builder fst(e) in
-          let then_bb_elif = L.append_block context "then " ^ count_elif the_function in 
-          ignore (build_stmt (L.builder_at_end context then_bb_elif) snd(e));
-          ) builder if_r.selif_branch;
-        let end_bb = L.append_block context "if_end" the_function in 
-        let build_br_end = L.build_br end_bb in 
-        add_terminal (L.builder_at_end context then_bb) build_br_end;
-        ignore(L.build_cond_br bool_val then_bb else_bb builder);
-        L.builder_at_end context end_bb
-        (* add terminals to the end of all elif branches *)
+          let count = 2 in
+          let (_, elif_li) = List.fold_left (fun res e -> 
+            let r = snd res in 
+            let count = fst res in 
+            let bool_val = build_expr builder (fst e) in 
+            let bb = (L.append_block context ("L"^string_of_int count) the_function) in
+            let body_bb = (L.append_block context ("L"^string_of_int count^"_body") the_function) in
+            let curr_builder = L.builder_at_end context body_bb in 
+            let then_stmt = snd e in 
+            let (b, _, _) = build_stmt(curr_builder, break_bb, continue_bb) then_stmt in
+            ignore(b);
+            (count+1, (bool_val, L.builder_at_end context bb, bb, body_bb)::r);
+          ) (count, [(bool_val_1, builder, break_bb, l1_body_bb)]) if_r.selif_branch in
+          (* counstruct last else bb*)
+          let count = count + 1 in
+          let else_bb = L.append_block context ("L"^string_of_int count^"_body") the_function in
+          let curr_builder = L.builder_at_end context else_bb in 
+          let then_stmt = if_r.selse_branch in 
+          let (b, _, _) = build_stmt(curr_builder, break_bb, continue_bb) then_stmt in
+          ignore(b);
+          let end_bb = L.append_block context "L_end" the_function in
+          (* elif_li looks like 
+            [(bool_val_3, L3 builder, L3 bb, L3_body),
+            (bool_val_2, L2, L2 bb, L2_body),
+            (bool_val_1, builder, break_bb, L1_body)] *)
+          (* elif_li_complete looks like 
+            [(bool_val_1, builder, break_bb, L1_body, L2), 
+            (bool_val_2, L2 builder, L2, L2_body, L3), 
+            (bool_val_3, L3 builder, L3, L3_body, L4), 
+            (None, Ln_body, else_bb, else_bb, L_end)] *)
+          let (elif_li_complete, _) = List.fold_left (fun r e -> 
+            let li = fst r in 
+            let next = snd r in
+            let (bool_val, bb_builder, bb, body_bb) = e in 
+            ((bool_val, bb_builder, bb, body_bb, next)::li, bb)
+          ) ([(bool_val_1, L.builder_at_end context else_bb, else_bb, else_bb, end_bb)], else_bb) elif_li in
+          (* add bz jumps *)
+          List.fold_left (fun r e -> 
+            let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in 
+            ignore(L.build_cond_br bool_val builder_body_bb next_bb builder);
+            e::r
+          ) [] elif_li_complete;
+  
+          (* add jmp L_end *)
+          let build_br_end = L.build_br end_bb in (* partial function *)
+          List.fold_left (fun r e -> 
+            let (bool_val, builder, builder_bb, builder_body_bb, next_bb) = e in
+            ignore(add_terminal (L.builder_at_end context builder_body_bb) build_br_end);
+            e::r
+          )
+          [] elif_li_complete;
+          (L.builder_at_end context end_bb, break_bb, continue_bb);
         
 
       (* | SWhile (predicate, body) ->
