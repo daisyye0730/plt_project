@@ -21,8 +21,12 @@
 /Users/daisyye/.opam/4.13.1/bin/ocamllex.opt -q scanner.mll # cached
 # Target: scanner.ml.depends, tags: { extension:ml, file:scanner.ml, ocaml, ocamldep, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules scanner.ml > scanner.ml.depends # cached
+# Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmo scanner.ml # cached
 # Target: semant.ml.depends, tags: { extension:ml, file:semant.ml, ocaml, ocamldep, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules semant.ml > semant.ml.depends # cached
+# Target: semant.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml # cached
 # Target: irgen.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:irgen.cmo, file:irgen.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmo irgen.ml
 + /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmo irgen.ml
@@ -58,56 +62,34 @@ File "irgen.ml", lines 110-144, characters 50-63:
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SListLit _|SListAssign (_, _)|SAccess (_, _)|SSlice (_, _, _))
-File "irgen.ml", lines 159-223, characters 58-65:
+File "irgen.ml", lines 159-222, characters 58-65:
 159 | ..........................................................function
 160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
 161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
 162 |       (* unconditional jump to break bb *)
 163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
 ...
-220 |         add_terminal (L.builder_at_end context l2_body_bb) build_br_end; 
-221 |         add_terminal (L.builder_at_end context l3_bb) build_br_end;
-222 | 
-223 |         (L.builder_at_end context end_bb, break_bb, continue_bb);
+219 |         add_terminal (L.builder_at_end context l2_body_bb) build_br_end; 
+220 |         add_terminal (L.builder_at_end context l3_bb) build_br_end;
+221 | 
+222 |         (L.builder_at_end context end_bb, break_bb, continue_bb);
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SWhile (_, _)|SFor_within (_, _, _)|SFor (_, _, _, _))
-# Target: scanner.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmo scanner.ml
-# Target: semant.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
-+ /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
-File "semant.ml", lines 142-146, characters 53-108:
-142 | .....................................................(match t1 with
-143 |                       Int -> Int 
-144 |                     | Float -> Float 
-145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
-146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Bool|Char|None|String)
-File "semant.ml", lines 148-151, characters 44-107:
-148 | ............................................(match t1 with
-149 |                       Int -> Bool 
-150 |                     | Float -> Bool 
-151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Bool|Char|None|String)
-File "semant.ml", line 153, characters 14-15:
-153 |             | _ -> raise (Failure err)
-                    ^
-Warning 11 [redundant-case]: this match case is unused.
 # Target: dinosaur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:dinosaur.cmo, file:dinosaur.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmo dinosaur.ml
 # Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o ast.cmx ast.ml
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o ast.cmx ast.ml # cached
 # Target: sast.cmx, tags: { compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmx sast.ml
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmx sast.ml # cached
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o parser.cmx parser.ml
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o parser.cmx parser.ml # cached
+# Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmx scanner.ml # cached
+# Target: semant.cmx, tags: { compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml # cached
 # Target: irgen.cmx, tags: { compile, extension:cmx, extension:ml, file:irgen.cmx, file:irgen.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
 + /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
@@ -143,46 +125,20 @@ File "irgen.ml", lines 110-144, characters 50-63:
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SListLit _|SListAssign (_, _)|SAccess (_, _)|SSlice (_, _, _))
-File "irgen.ml", lines 159-223, characters 58-65:
+File "irgen.ml", lines 159-222, characters 58-65:
 159 | ..........................................................function
 160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
 161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
 162 |       (* unconditional jump to break bb *)
 163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
 ...
-220 |         add_terminal (L.builder_at_end context l2_body_bb) build_br_end; 
-221 |         add_terminal (L.builder_at_end context l3_bb) build_br_end;
-222 | 
-223 |         (L.builder_at_end context end_bb, break_bb, continue_bb);
+219 |         add_terminal (L.builder_at_end context l2_body_bb) build_br_end; 
+220 |         add_terminal (L.builder_at_end context l3_bb) build_br_end;
+221 | 
+222 |         (L.builder_at_end context end_bb, break_bb, continue_bb);
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SWhile (_, _)|SFor_within (_, _, _)|SFor (_, _, _, _))
-# Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmx scanner.ml
-# Target: semant.cmx, tags: { compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
-+ /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
-File "semant.ml", lines 142-146, characters 53-108:
-142 | .....................................................(match t1 with
-143 |                       Int -> Int 
-144 |                     | Float -> Float 
-145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
-146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Bool|Char|None|String)
-File "semant.ml", lines 148-151, characters 44-107:
-148 | ............................................(match t1 with
-149 |                       Int -> Bool 
-150 |                     | Float -> Bool 
-151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
-Warning 8 [partial-match]: this pattern-matching is not exhaustive.
-Here is an example of a case that is not matched:
-(Bool|Char|None|String)
-File "semant.ml", line 153, characters 14-15:
-153 |             | _ -> raise (Failure err)
-                    ^
-Warning 11 [redundant-case]: this match case is unused.
 # Target: dinosaur.cmx, tags: { compile, extension:cmx, extension:ml, file:dinosaur.cmx, file:dinosaur.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmx dinosaur.ml
 # Target: dinosaur.native, tags: { dont_link_with, extension:native, file:dinosaur.native, link, native, ocaml, program, quiet }

@@ -188,7 +188,6 @@ let translate (globals, functions) =
         L_end: *)
       | SIf (if_r) ->  
         let bool_val_1 = build_expr builder (fst(if_r.sif_branch)) in
-        let l1_bb = L.append_block context "L1" the_function in
         let l1_body_bb = L.append_block context "L1_body" the_function in
         let curr_builder = L.builder_at_end context l1_body_bb in
         let then_stmt = snd(if_r.sif_branch) in
@@ -210,7 +209,7 @@ let translate (globals, functions) =
         ignore(b);
 
         (* add bz jumps *)
-        ignore(L.build_cond_br bool_val_1 l1_body_bb l2_bb (L.builder_at_end context l1_bb));
+        ignore(L.build_cond_br bool_val_1 l1_body_bb l2_bb builder);
         ignore(L.build_cond_br bool_val_2 l2_body_bb l3_bb (L.builder_at_end context l2_bb));
 
         (* add jmp L_end *)
