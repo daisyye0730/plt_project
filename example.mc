@@ -4,14 +4,18 @@ int b;
 int main() {
   int x;
   int y;
-  bool z;
-  string str;
-  int sum;
-  str = "abc";
+  int z;
   x = 10;
   y = 5;
-  z = x > y;
-  sum = x + y;
-  print(sum);
+  if (x > y) {
+      z = y - x;
+      print(z);
+  } elif (x < y) {
+      z = x - y;
+      print(z);
+  } else {
+      z = 0;
+      print(z);
+  }
   return 0;
 }
