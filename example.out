@@ -98,8 +98,8 @@ while_body_block:                                 ; preds = %while_predicate_blo
   br i1 %tmp38, label %L1_body39, label %L3_body42
 
 while_merge_block:                                ; preds = %while_predicate_block, %L1_body39
-  %printf49 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 0)
-  ret i32 0
+  store i32 1, i32* %x, align 4
+  br label %while_predicate_block49
 
 L1_body39:                                        ; preds = %while_body_block
   %z40 = load i32, i32* %z, align 4
@@ -113,4 +113,31 @@ L_end43:                                          ; preds = %L3_body42
   %x44 = load i32, i32* %x, align 4
   %printf45 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %x44)
   br label %while_predicate_block
+
+while_predicate_block49:                          ; preds = %L_end58, %while_merge_block
+  %x61 = load i32, i32* %x, align 4
+  %tmp62 = icmp slt i32 %x61, 5
+  br i1 %tmp62, label %while_body_block50, label %while_merge_block51
+
+while_body_block50:                               ; preds = %while_predicate_block49
+  %x52 = load i32, i32* %x, align 4
+  %printf53 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt, i32 0, i32 0), i32 %x52)
+  %x54 = load i32, i32* %x, align 4
+  %tmp55 = icmp eq i32 %x54, 2
+  br i1 %tmp55, label %L1_body56, label %L3_body57
+
+while_merge_block51:                              ; preds = %while_predicate_block49, %L1_body56
+  ret i32 0
+
+L1_body56:                                        ; preds = %while_body_block50
+  br label %while_merge_block51
+
+L3_body57:                                        ; preds = %L3_body57, %while_body_block50
+  br i1 %tmp55, label %L3_body57, label %L_end58
+
+L_end58:                                          ; preds = %L3_body57
+  %x59 = load i32, i32* %x, align 4
+  %tmp60 = add i32 %x59, 1
+  store i32 %tmp60, i32* %x, align 4
+  br label %while_predicate_block49
 }

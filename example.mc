@@ -34,5 +34,14 @@ int main() {
       }
       print(x);
   }
+
+  for (x = 1; x < 5; x++) {
+      print(x);
+      if (x == 2) {
+        break;
+      } else {
+          
+      }
+  }
   return 0;
 }

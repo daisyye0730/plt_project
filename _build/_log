@@ -77,20 +77,20 @@ File "irgen.ml", lines 224-229, characters 10-29:
 228 |           )
 229 |           [] elif_li_complete.
 Warning 10 [non-unit-statement]: this expression should have type unit.
-File "irgen.ml", lines 159-243, characters 58-84:
+File "irgen.ml", lines 159-245, characters 58-62:
 159 | ..........................................................function
 160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
 161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
 162 |       (* unconditional jump to break bb *)
 163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
 ...
-240 |         let predicate_builder = L.builder_at_end context while_predicate_bb in
-241 |         let bool_val = build_expr predicate_builder predicate in
 242 |         ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
 243 |         ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
+244 |       | SFor(e1, e2, e3, s1) -> build_stmt(builder,break_bb,continue_bb) 
+245 |         (SBlock[SExpr e1; SWhile (e2, SBlock [s1; SExpr e3])])
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SFor_within (_, _, _)|SFor (_, _, _, _))
+SFor_within (_, _, _)
 # Target: dinosaur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:dinosaur.cmo, file:dinosaur.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmo dinosaur.ml
 # Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
@@ -155,20 +155,20 @@ File "irgen.ml", lines 224-229, characters 10-29:
 228 |           )
 229 |           [] elif_li_complete.
 Warning 10 [non-unit-statement]: this expression should have type unit.
-File "irgen.ml", lines 159-243, characters 58-84:
+File "irgen.ml", lines 159-245, characters 58-62:
 159 | ..........................................................function
 160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
 161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
 162 |       (* unconditional jump to break bb *)
 163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
 ...
-240 |         let predicate_builder = L.builder_at_end context while_predicate_bb in
-241 |         let bool_val = build_expr predicate_builder predicate in
 242 |         ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
 243 |         ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
+244 |       | SFor(e1, e2, e3, s1) -> build_stmt(builder,break_bb,continue_bb) 
+245 |         (SBlock[SExpr e1; SWhile (e2, SBlock [s1; SExpr e3])])
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SFor_within (_, _, _)|SFor (_, _, _, _))
+SFor_within (_, _, _)
 # Target: dinosaur.cmx, tags: { compile, extension:cmx, extension:ml, file:dinosaur.cmx, file:dinosaur.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmx dinosaur.ml
 # Target: dinosaur.native, tags: { dont_link_with, extension:native, file:dinosaur.native, link, native, ocaml, program, quiet }
