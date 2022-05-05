@@ -203,7 +203,7 @@ let translate (globals, functions) =
         (* add terminals to the end of all elif branches *)
         
 
-      | SWhile (predicate, body) ->
+      (* | SWhile (predicate, body) ->
         let while_bb = L.append_block context "while" the_function in
         let build_br_while = L.build_br while_bb in (* partial function *)
         ignore (build_br_while builder);
@@ -216,7 +216,7 @@ let translate (globals, functions) =
         let end_bb = L.append_block context "while_end" the_function in
 
         ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
-        L.builder_at_end context end_bb
+        L.builder_at_end context end_bb *)
 
     in
     (* Build the code for each statement in the function *)
