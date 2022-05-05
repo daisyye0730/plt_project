@@ -58,9 +58,9 @@ File "irgen.ml", lines 110-144, characters 50-63:
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SListLit _|SListAssign (_, _)|SAccess (_, _)|SSlice (_, _, _))
-File "irgen.ml", line 187, characters 23-33:
-187 |         let bool_val = build_expr builder fst(if_r.sif_branch) in
-                             ^^^^^^^^^^
+File "irgen.ml", line 214, characters 25-35:
+214 |         let bool_val_2 = build_expr builder fst(List.hd if_r.selif_branch) in
+                               ^^^^^^^^^^
 Error: This function has type L.llbuilder -> Sast.sexpr -> L.llvalue
        It is applied to too many arguments; maybe you forgot a `;'.
 Command exited with code 2.

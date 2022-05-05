@@ -183,26 +183,58 @@ let translate (globals, functions) =
 
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context end_bb *)
-      | SIf (if_r) ->  
-        let bool_val = build_expr builder fst(if_r.sif_branch) in
-        let then_bb = L.append_block context "then" the_function in
-         ignore (build_stmt (L.builder_at_end context then_bb) snd(if_r.sif_branch));
-        (* create blocks for all elif branches *)
-        let count_elif = 0 in
-        List.fold_left (fun count_elif e -> 
-          let count_elif = count_elif + 1 in
-          let bool_val_elif = build_expr builder fst(e) in
-          let then_bb_elif = L.append_block context "then " ^ count_elif the_function in 
-          ignore (build_stmt (L.builder_at_end context then_bb_elif) snd(e));
-          ) builder if_r.selif_branch;
-        let end_bb = L.append_block context "if_end" the_function in 
-        let build_br_end = L.build_br end_bb in 
-        add_terminal (L.builder_at_end context then_bb) build_br_end;
-        (* add terminals to the end of all elif branches *)
-        
-        
 
-      (* | SWhile (predicate, body) ->
+        (* if(E1) {S1} elif(E2) {S2} else{S3} *)
+        (* three address code 
+        L1: E1.code 
+        bz L2 E1.addr
+        -------------
+        L1_body: S1.code 
+        jmp L_end
+        -------------
+        L2: E2.code 
+        bz L3 E2.addr 
+        -------------
+        L2_body: S2.code 
+        jmp L_end
+        ------------
+        L3: L3.code 
+        jmp L_end 
+        ------------
+        L_end: *)
+      | SIf (if_r) ->  
+        let bool_val_1 = build_expr builder (fst(if_r.sif_branch)) in
+        let l1_bb = L.append_block context "L1" the_function in
+        let l1_body_bb = L.append_block context "L1_body" the_function in
+        let curr_builder = L.builder_at_end context l1_body_bb in
+        let then_stmt = snd(if_r.sif_branch) in
+        let (b, _, _) = build_stmt(curr_builder, break_bb, continue_bb) then_stmt
+        in ignore(b);
+        
+        let bool_val_2 = build_expr builder fst(List.hd if_r.selif_branch) in
+        let l2_bb = L.append_block context "L2" the_function in
+        let l2_body_bb = L.append_block context "L2_body" the_function in
+        ignore(build_stmt (L.builder_at_end context l2_body_bb) snd(List.hd if_r.selif_branch) break_bb continue_bb);
+
+        let l3_bb = L.append_block context "L3" the_function in 
+        ignore(build_stmt ((L.builder_at_end context l3_bb) break_bb continue_bb) if_r.selse_branch);
+
+        (* add bz jumps *)
+        let instr_1 = L.build_cond_br bool_val_1 l1_body_bb l2_bb (L.build_at_end context l1_bb) in 
+        add_terminal (L.builder_at_end context l1_bb) instr_1;
+        let instr_2 = L.build_cond_br bool_val_2 l2_body_bb l3_bb (L.build_at_end context l2_bb) in 
+        add_terminal (L.builder_at_end context l2_bb) instr_2;
+
+        (* add jmp L_end *)
+        let end_bb = L.append_block context "L_end" the_function in
+        let build_br_end = L.build_br end_bb in (* partial function *)
+        add_terminal (L.builder_at_end context l1_body_bb) build_br_end;
+        add_terminal (L.builder_at_end context l2_body_bb) build_br_end; 
+        add_terminal (L.builder_at_end context l3_bb) build_br_end;
+
+        L.builder_at_end context end_bb;
+        
+      | SWhile (predicate, body) ->
         let while_bb = L.append_block context "while" the_function in
         let build_br_while = L.build_br while_bb in (* partial function *)
         ignore (build_br_while builder);
@@ -215,7 +247,7 @@ let translate (globals, functions) =
         let end_bb = L.append_block context "while_end" the_function in
 
         ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
-        L.builder_at_end context end_bb *)
+        L.builder_at_end context end_bb
 
     in
     (* Build the code for each statement in the function *)
