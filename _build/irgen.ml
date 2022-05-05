@@ -161,38 +161,13 @@ let translate (globals, functions) =
       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
       (* unconditional jump to break bb *)
       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
-        let next_bb = L.append_block context "after_break" the_function in 
-        let builder = L.builder_at_end context next_bb in (builder, break_bb, continue_bb)
+        let builder = L.builder_at_end context break_bb in (builder, break_bb, continue_bb)
       (* unconditional jump to continue bb*)
-      | SContinue -> ignore(add_terminal builder(L.build_br continue_bb));
-        let continue_bb = L.append_block context "after_continue" the_function in 
+      | SContinue -> 
+        ignore(add_terminal builder(L.build_br continue_bb)); 
         let builder = L.builder_at_end context continue_bb in (builder, break_bb, continue_bb)
       | SReturn e -> ignore(L.build_ret (build_expr builder e) builder); (builder, break_bb, continue_bb)    
-        (* if(E1) {S1} elif(E2) {S2} elif(E3) {S3} else{S3} L_end: *)
-        (* three address code 
-        E1.code 
-        bz L2 E1.addr
-        -------------
-        L1_body: S1.code 
-        jmp L_end
-        -------------
-        L2: E2.code 
-        bz L3 E2.addr 
-        -------------
-        L2_body: S2.code 
-        jmp L_end
-        ------------
-        L3: E3.code 
-        bz L4 E3.addr
-        ------------
-        L3_body: S3.code 
-        jmp L_end
-        ------------
-        L4: L3.code 
-        jmp L_end 
-        ------------
-        L_end: *)
-        | SIf (if_r) -> 
+      | SIf (if_r) -> 
           (* construct if then-stmt *) 
           let bool_val_1 = build_expr builder (fst(if_r.sif_branch)) in
           let l1_body_bb = L.append_block context "L1_body" the_function in
@@ -253,23 +228,19 @@ let translate (globals, functions) =
           )
           [] elif_li_complete;
           (L.builder_at_end context end_bb, break_bb, continue_bb);
-        
-
-      (* | SWhile (predicate, body) ->
-        let while_bb = L.append_block context "while" the_function in
-        let build_br_while = L.build_br while_bb in (* partial function *)
-        ignore (build_br_while builder);
-        let while_builder = L.builder_at_end context while_bb in
-        let bool_val = build_expr while_builder predicate in
-
-        let body_bb = L.append_block context "while_body" the_function in
-        add_terminal (build_stmt (L.builder_at_end context body_bb) body) build_br_while;
-
-        let end_bb = L.append_block context "while_end" the_function in
-
-        ignore(L.build_cond_br bool_val body_bb end_bb while_builder);
-        L.builder_at_end context end_bb *)
-
+      | SWhile (predicate, body) ->
+        let while_predicate_bb = L.append_block context "while_predicate_block" the_function in
+        ignore (L.build_br while_predicate_bb builder);
+        let while_body_bb = L.append_block context "while_body_block" the_function in
+        let while_merge_bb = L.append_block context "while_merge_block" the_function in
+        let break_builder = while_merge_bb and continue_builder = while_predicate_bb in
+        let b = L.builder_at_end context while_body_bb in
+        let (temp, _, _) = build_stmt (b, break_builder, continue_builder) body in
+        ignore(add_terminal temp (L.build_br while_predicate_bb)); 
+        let predicate_builder = L.builder_at_end context while_predicate_bb in
+        let bool_val = build_expr predicate_builder predicate in
+        ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
+        ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
     in
     (* Build the code for each statement in the function *)
     let bb = L.append_block context "dummy_block" the_function in
