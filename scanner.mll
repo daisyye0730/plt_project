@@ -42,7 +42,7 @@ rule token = parse
 | "--"     { MINUSMINUS }
 | "and"    { AND } 
 | "or"     { OR } 
-| "in"     { IN }
+(* | "in"     { IN } *)
 (* Branch Control *)
 | "if"     { IF }
 | "else"   { ELSE }
@@ -60,7 +60,6 @@ rule token = parse
 | "string" { STRING }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
-(* | "struct" { STRUCT }  *)
 | "List"   { LIST }
 | "None"   { NONE }
 (* Function *)
@@ -68,7 +67,7 @@ rule token = parse
 | "def"    { DEF }
 (* Other *)
 | digit+ as lem  { INT_LITERAL(int_of_string lem) }
-| float as lxm   { FLOAT_LITERAL(float_of_string lxm) }
+| ['0'-'9']+('.'['0'-'9']+)? | '.'['0'-'9']+ as lxm  { FLOAT_LITERAL(lxm) }
 | char as lxm    { CHAR_LITERAL( String.get lxm 1 ) }
 | '"' ( (ascii | escape)* as s) '"'   { STRING_LITERAL(s) }
 | letter (digit | letter | '_')* as lem { ID(lem) }

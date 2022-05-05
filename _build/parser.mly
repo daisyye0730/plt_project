@@ -8,12 +8,12 @@ open Ast
 %token PLUS MINUS TIMES DIVIDE MODULO PLUSPLUS MINUSMINUS
 %token NOT
 %token ASSIGN MINUSEQ PLUSEQ
-%token EQ NEQ LT LEQ GT GEQ AND OR IN
+%token EQ NEQ LT LEQ GT GEQ AND OR
 %token WITHIN BREAK CONTINUE IF ELSE ELIF FOR WHILE 
 %token INT FLOAT BOOL CHAR LIST NONE STRING
 %token RETURN DEF
 %token <int> INT_LITERAL
-%token <float> FLOAT_LITERAL
+%token <string> FLOAT_LITERAL
 %token <char> CHAR_LITERAL
 %token <string> STRING_LITERAL
 %token <bool> BLIT
@@ -53,7 +53,7 @@ typ:
   | BOOL  { Bool  } 
   | FLOAT  { Float } 
   | CHAR   { Char } 
-  // | STRUCT  { STRUCT } 
+  // | STRUCT { Struct } 
   | LIST LPAREN typ COMMA INT_LITERAL RPAREN  { List($3, $5) } // this will be a type List (int, 4) 
   | NONE  { None }  
   | STRING { String } 

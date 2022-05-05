@@ -1,12 +1,12 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | In | Leq | Geq
+type op = Add | Sub | Times | Divide | Modulo | Equal | Neq | Less | Greater | And | Or | Leq | Geq
 
-type typ = Int | Bool | Float | Char | Class | List of typ * int | None | String
+type typ = Int | Bool | Float | Char | List of typ * int | None | String 
 
 type expr =
     Int_Literal of int
-  | Float_Literal of float 
+  | Float_Literal of string 
   | Char_Literal of char 
   | String_Literal of string
   | BoolLit of bool
@@ -64,13 +64,12 @@ let string_of_op = function
   | Greater -> ">"
   | And -> "&&"
   | Or -> "||"
-  | In -> "in"
   | Leq -> "<="
   | Geq -> ">="
 
 let rec string_of_expr = function
     Int_Literal(l) -> string_of_int l
-  | Float_Literal(l) -> string_of_float l
+  | Float_Literal(l) -> l
   | Char_Literal(l) -> String.make 1 l
   | String_Literal(s) -> s
   | BoolLit(true) -> "true"
@@ -109,7 +108,7 @@ let rec string_of_typ = function
   | Bool -> "bool"
   | Float -> "float"
   | Char -> "char"
-  | Class -> "class"
+  (* | Class -> "class" *)
   | List (typ, integer) -> "List(" ^ string_of_typ typ ^ ", " ^ string_of_int integer ^ ")"
   | None -> "None"
   | String -> "string"

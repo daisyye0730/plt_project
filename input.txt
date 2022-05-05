@@ -19,9 +19,9 @@ int main() {
   float z;
   string op;
   
-  List(char, 5) str1;
+  List(char, 9) str1;
 
-  List(float, 4) new_list;
+  List(float, 7) new_list;
   List(float, 1) sublist;
   
   List(bool, 3) l1;

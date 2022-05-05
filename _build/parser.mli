@@ -28,7 +28,6 @@ type token =
   | GEQ
   | AND
   | OR
-  | IN
   | WITHIN
   | BREAK
   | CONTINUE
@@ -47,7 +46,7 @@ type token =
   | RETURN
   | DEF
   | INT_LITERAL of (int)
-  | FLOAT_LITERAL of (float)
+  | FLOAT_LITERAL of (string)
   | CHAR_LITERAL of (char)
   | STRING_LITERAL of (string)
   | BLIT of (bool)
