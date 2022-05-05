@@ -204,7 +204,6 @@ let check (globals, functions) =
       | Break -> SBreak
       | Continue -> SContinue
       | For(e1, e2, e3, s1) -> SFor(check_expr e1, check_expr e2, check_expr e3, check_stmt s1)
-      | For_within(e1, e2, s1) -> SFor_within(check_expr e1, check_expr e2, check_stmt s1)
     (*if_record = 
     {
         if_branch: expr * stmt;

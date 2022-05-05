@@ -28,7 +28,6 @@ type token =
   | GEQ
   | AND
   | OR
-  | WITHIN
   | BREAK
   | CONTINUE
   | IF

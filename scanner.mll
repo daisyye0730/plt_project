@@ -51,7 +51,6 @@ rule token = parse
 | "while"  { WHILE }
 | "continue" { CONTINUE }
 | "break"  { BREAK }
-| "within" { WITHIN }
 (* Data Types *)
 | "int"    { INT } 
 | "float"  { FLOAT } 

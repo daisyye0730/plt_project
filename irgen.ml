@@ -241,8 +241,9 @@ let translate (globals, functions) =
         let bool_val = build_expr predicate_builder predicate in
         ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
         ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
-      | SFor(e1, e2, e3, s1) -> build_stmt(builder,break_bb,continue_bb) 
+      | SFor(e1, e2, e3, s1) -> build_stmt(builder, break_bb, continue_bb) 
         (SBlock[SExpr e1; SWhile (e2, SBlock [s1; SExpr e3])])
+    
     in
     (* Build the code for each statement in the function *)
     let bb = L.append_block context "dummy_block" the_function in

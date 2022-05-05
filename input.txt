@@ -23,6 +23,7 @@ int gcd(int a, int b) {
 int main() {
   int x;
   int y;
+  int num;
   float z;
   string op;
 
@@ -38,7 +39,7 @@ int main() {
   
   List(bool, 3) boolLi;
 
-  sum = t1 + t2;
+  t1 = [2, 3, 4];
   op = "abc";
   boolLi = [x > y, x > y, x == y];
   new_list = [3.5, 2.0, 4.7, 2.2]; 
@@ -50,6 +51,10 @@ int main() {
   b = 9;
   x = 2;
   y = 14;
+
+  for (num within t1) {
+    num++;
+  }
   print(gcd(x,y));
   print(gcd(3,15));
   print(gcd(99,121));

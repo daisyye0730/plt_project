@@ -9,7 +9,7 @@ open Ast
 %token NOT
 %token ASSIGN MINUSEQ PLUSEQ
 %token EQ NEQ LT LEQ GT GEQ AND OR
-%token WITHIN BREAK CONTINUE IF ELSE ELIF FOR WHILE 
+%token BREAK CONTINUE IF ELSE ELIF FOR WHILE 
 %token INT FLOAT BOOL CHAR LIST NONE STRING
 %token RETURN DEF
 %token <int> INT_LITERAL
@@ -120,7 +120,6 @@ stmt:
   | if_stmt                                 { $1 }
   | WHILE LPAREN expr RPAREN stmt           { While ($3, $5)  }
   | FOR LPAREN expr SEMI expr SEMI expr RPAREN stmt { For ($3, $5, $7, $9) }
-  | FOR LPAREN expr WITHIN expr RPAREN stmt { For_within ($3, $5, $7) }
   | RETURN expr SEMI                        { Return $2      }
   | BREAK SEMI                              { Break  }
   | CONTINUE SEMI                           { Continue }

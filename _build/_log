@@ -6,11 +6,11 @@
 # Target: ast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o ast.cmo ast.ml # cached
 # Target: irgen.ml.depends, tags: { extension:ml, file:irgen.ml, ocaml, ocamldep, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules irgen.ml > irgen.ml.depends
+/Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules irgen.ml > irgen.ml.depends # cached
 # Target: sast.ml.depends, tags: { extension:ml, file:sast.ml, ocaml, ocamldep, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules sast.ml > sast.ml.depends # cached
+/Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules sast.ml > sast.ml.depends
 # Target: sast.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmo sast.ml # cached
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmo sast.ml
 # Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlyacc parser.mly # cached
 # Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
@@ -25,8 +25,6 @@
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmo scanner.ml # cached
 # Target: semant.ml.depends, tags: { extension:ml, file:semant.ml, ocaml, ocamldep, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules semant.ml > semant.ml.depends # cached
-# Target: semant.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml # cached
 # Target: irgen.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:irgen.cmo, file:irgen.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmo irgen.ml
 + /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmo irgen.ml
@@ -77,34 +75,42 @@ File "irgen.ml", lines 224-229, characters 10-29:
 228 |           )
 229 |           [] elif_li_complete.
 Warning 10 [non-unit-statement]: this expression should have type unit.
-File "irgen.ml", lines 159-245, characters 58-62:
-159 | ..........................................................function
-160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
-161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
-162 |       (* unconditional jump to break bb *)
-163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
-...
-242 |         ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
-243 |         ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
-244 |       | SFor(e1, e2, e3, s1) -> build_stmt(builder,break_bb,continue_bb) 
-245 |         (SBlock[SExpr e1; SWhile (e2, SBlock [s1; SExpr e3])])
+# Target: semant.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
++ /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmo semant.ml
+File "semant.ml", lines 142-146, characters 53-108:
+142 | .....................................................(match t1 with
+143 |                       Int -> Int 
+144 |                     | Float -> Float 
+145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
+146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-SFor_within (_, _, _)
+(Bool|Char|None|String)
+File "semant.ml", lines 148-151, characters 44-107:
+148 | ............................................(match t1 with
+149 |                       Int -> Bool 
+150 |                     | Float -> Bool 
+151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", line 153, characters 14-15:
+153 |             | _ -> raise (Failure err)
+                    ^
+Warning 11 [redundant-case]: this match case is unused.
 # Target: dinosaur.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:dinosaur.cmo, file:dinosaur.ml, implem, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlc.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmo dinosaur.ml
 # Target: ast.cmx, tags: { compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o ast.cmx ast.ml # cached
 # Target: sast.cmx, tags: { compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmx sast.ml # cached
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o sast.cmx sast.ml
 # Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamldep.opt -modules parser.ml > parser.ml.depends # cached
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o parser.cmx parser.ml # cached
 # Target: scanner.cmx, tags: { compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o scanner.cmx scanner.ml # cached
-# Target: semant.cmx, tags: { compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
-/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml # cached
 # Target: irgen.cmx, tags: { compile, extension:cmx, extension:ml, file:irgen.cmx, file:irgen.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
 + /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o irgen.cmx irgen.ml
@@ -155,20 +161,30 @@ File "irgen.ml", lines 224-229, characters 10-29:
 228 |           )
 229 |           [] elif_li_complete.
 Warning 10 [non-unit-statement]: this expression should have type unit.
-File "irgen.ml", lines 159-245, characters 58-62:
-159 | ..........................................................function
-160 |         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
-161 |       | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
-162 |       (* unconditional jump to break bb *)
-163 |       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
-...
-242 |         ignore (L.build_cond_br bool_val while_body_bb while_merge_bb predicate_builder);
-243 |         ((L.builder_at_end context while_merge_bb), break_builder, continue_builder)
-244 |       | SFor(e1, e2, e3, s1) -> build_stmt(builder,break_bb,continue_bb) 
-245 |         (SBlock[SExpr e1; SWhile (e2, SBlock [s1; SExpr e3])])
+# Target: semant.cmx, tags: { compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet }
+/Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
++ /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o semant.cmx semant.ml
+File "semant.ml", lines 142-146, characters 53-108:
+142 | .....................................................(match t1 with
+143 |                       Int -> Int 
+144 |                     | Float -> Float 
+145 |                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
+146 |                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
 Warning 8 [partial-match]: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-SFor_within (_, _, _)
+(Bool|Char|None|String)
+File "semant.ml", lines 148-151, characters 44-107:
+148 | ............................................(match t1 with
+149 |                       Int -> Bool 
+150 |                     | Float -> Bool 
+151 |                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
+Warning 8 [partial-match]: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Bool|Char|None|String)
+File "semant.ml", line 153, characters 14-15:
+153 |             | _ -> raise (Failure err)
+                    ^
+Warning 11 [redundant-case]: this match case is unused.
 # Target: dinosaur.cmx, tags: { compile, extension:cmx, extension:ml, file:dinosaur.cmx, file:dinosaur.ml, implem, native, ocaml, quiet }
 /Users/daisyye/.opam/4.13.1/bin/ocamlopt.opt -c -I /Users/daisyye/.opam/4.13.1/lib/llvm -o dinosaur.cmx dinosaur.ml
 # Target: dinosaur.native, tags: { dont_link_with, extension:native, file:dinosaur.native, link, native, ocaml, program, quiet }

@@ -32,7 +32,6 @@ type stmt =
   }
   | While of expr * stmt
   | For of expr * expr * expr * stmt 
-  | For_within of expr * expr * stmt (* For X within Y *)
   | Return of expr
   | Break 
   | Continue
@@ -100,8 +99,6 @@ let rec string_of_stmt = function
   | Continue -> "Continue\n"
   | For(e1, e2, e3, s1) -> "For (" ^ string_of_expr e1 ^ "; " 
         ^ string_of_expr e2 ^ "; " ^ string_of_expr e3 ^ ")\n" ^ string_of_stmt s1 
-  | For_within(e1, e2, s1) -> "For (" ^ string_of_expr e1 ^ "within " 
-      ^ string_of_expr e2 ^ ")\n" ^ string_of_stmt s1
 
 let rec string_of_typ = function
     Int -> "int"

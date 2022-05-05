@@ -29,7 +29,6 @@ type sstmt =
         selse_branch: sstmt;
     }
   | SWhile of sexpr * sstmt
-  | SFor_within of sexpr * sexpr * sstmt
   | SFor of sexpr * sexpr * sexpr * sstmt
   (* return *)
   | SReturn of sexpr
@@ -84,8 +83,6 @@ let rec string_of_sstmt = function
   | SContinue -> "Continue\n"
   | SFor(e1, e2, e3, s1) -> "For (" ^ string_of_sexpr e1 ^ "; " 
         ^ string_of_sexpr e2 ^ "; " ^ string_of_sexpr e3 ^ ")\n" ^ string_of_sstmt s1 
-  | SFor_within(e1, e2, s1) -> "For (" ^ string_of_sexpr e1 ^ "within " 
-      ^ string_of_sexpr e2 ^ ")\n" ^ string_of_sstmt s1
 
 let string_of_sfdecl fdecl =
   string_of_typ fdecl.srtyp ^ " " ^

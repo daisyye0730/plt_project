@@ -5,6 +5,7 @@ int main() {
   int x;
   int y;
   int z;
+ ###
   x = 2;
   y = 5;
   if (x > y) {
@@ -40,8 +41,12 @@ int main() {
       if (x == 2) {
         break;
       } else {
-          
+
       }
+  }
+###
+  for (z within x) {
+      print(z);
   }
   return 0;
 }
