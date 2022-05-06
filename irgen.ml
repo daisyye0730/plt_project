@@ -27,23 +27,24 @@ let translate (globals, functions) =
   let the_module = L.create_module context "dinosaur" in
 
   (* Get types from the context *)
-  let i32_t      = L.i32_type    context
-  and i8_t       = L.i8_type     context
-  and i1_t       = L.i1_type     context 
-  and float_t    = L.double_type context 
-  and void_t     = L.void_type   context 
-  and str_t      = L.pointer_type (L.i8_type context) 
+  let i32_t          = L.i32_type    context
+  and i8_t           = L.i8_type     context
+  and i1_t           = L.i1_type     context 
+  and float_t        = L.double_type context 
+  and void_t         = L.void_type   context 
+  and str_t          = L.pointer_type (L.i8_type context)
+  and list_t ty len  = L.array_type ty len  
   in
 
   (* Return the LLVM type for a dinasour type *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int   -> i32_t
     | A.Float -> float_t
     | A.Bool  -> i1_t
     | A.Char -> i1_t
     | A.None -> void_t
     | A.String -> str_t
-    (* | A.List(typ, len) ->  *)
+    | A.List(typ, len) -> list_t (ltype_of_typ typ) len 
   in
 
   (* Create a map of global variables after creating each *)
@@ -117,12 +118,28 @@ let translate (globals, functions) =
 
     (* Construct code for an expression; return its value *)
     let rec build_expr builder ((_, e) : sexpr) = match e with
-        SInt_Literal(i)  -> L.const_int i32_t i
-      | SFloat_Literal(f) -> L.const_float_of_string float_t f
-      | SChar_Literal(c) -> L.const_int i8_t (Char.code c)
-      | SString_Literal(str)-> L.build_global_stringptr str "STRINGLITERAL" builder
-      | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
-      | SId s       -> L.build_load (lookup s) s builder
+        SInt_Literal(i)       -> L.const_int i32_t i
+      | SFloat_Literal(f)     -> L.const_float_of_string float_t f
+      | SChar_Literal(c)      -> L.const_int i8_t (Char.code c)
+      | SString_Literal(str)  -> L.build_global_stringptr str "STRINGLITERAL" builder
+      | SBoolLit b            -> L.const_int i1_t (if b then 1 else 0)
+      | SId s                 -> L.build_load (lookup s) s builder
+      (* | SListLit l -> 
+          let ty_of_l = fst (List.hd l)
+          and first_ele = snd (List.hd l)
+          in
+          let li = 
+            List.fold_left (fun r e -> build_expr builder e::r) [] l
+          in 
+          (match ty_of_l with 
+            A.Int -> List.fold_left (fun e -> L.const_int i32_t e) (L.const_int i32_t first_ele) li
+          (* | A.Float -> 
+          | A.Bool ->  *)
+          | _ -> raise(Failure ("error"))) *)
+      | SListLit lp -> let li = List.fold_left (
+          fun li e -> let e' = build_expr builder e in e'::li
+        ) [] lp in
+         List.hd li
       | SAssign (s, e) -> let e' = build_expr builder e in
         ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (e1, op, e2) ->
@@ -159,7 +176,6 @@ let translate (globals, functions) =
          | A.Geq     -> L.build_icmp L.Icmp.Sge
          | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
         ) e1' e2' "tmp" builder
-
         else if t1 = A.Bool && t2 = A.Bool then 
           (match op with 
             A.And -> L.build_and
@@ -168,29 +184,30 @@ let translate (globals, functions) =
           | A.Neq -> L.build_icmp L.Icmp.Ne
           | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
         ) e1' e2' "tmp" builder
-
         else if t1 = A.String && t2 = A.String then
         (match op with 
           | A.Sub     -> L.build_call strcmp_func
           | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
-        ) [| e1'; e2' |]  "tmp" builder 
-
+        ) [| e1';e2' |]  "tmp" builder 
         else raise (Failure ("CodeGen match failed in Binop."))
 
       | SCall ("print", [e]) ->
-        L.build_call printf_func [| int_format_str ; (build_expr builder e) |]
+        L.build_call printf_func [| int_format_str ; build_expr builder e |]
           "printf" builder
       | SCall ("strcmp", [e1; e2]) -> 
-        L.build_call strcmp_func  [| (build_expr builder e1); (build_expr builder e2) |] 
+        L.build_call strcmp_func  [| build_expr builder e1; build_expr builder e2 |]
           "strcmp" builder
       | SCall ("printb", [e]) -> 
-        L.build_call printf_func [| bool_format_str ; (build_expr builder e) |]
+        L.build_call printf_func [| bool_format_str ; build_expr builder e |]
           "printb" builder
-      | SCall ("printf", [e]) -> L.build_call printf_func [| float_format_str ; (build_expr builder e) |] 
+      | SCall ("printf", [e]) -> 
+        L.build_call printf_func [| float_format_str ; build_expr builder e |] 
           "printf" builder
-      | SCall ("printc", [e]) -> L.build_call printf_func [| char_format_str ; (build_expr builder e) |] 
+      | SCall ("printc", [e]) -> 
+        L.build_call printf_func [| char_format_str ; build_expr builder e |] 
           "prints" builder
-      | SCall ("prints", [e]) -> L.build_call printf_func [| string_format_str ; (build_expr builder e) |] 
+      | SCall ("prints", [e]) -> 
+        L.build_call printf_func [| string_format_str ; build_expr builder e |] 
           "prints" builder
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in

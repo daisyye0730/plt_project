@@ -8,9 +8,15 @@ int main() {
   string str1;
   string str2;
   bool val;
+  List(int, 2) new_li;
  
   x = 2;
   y = 5;
+  
+  new_li = [2, 3];
+
+
+  ###
   str1 = "abcd";
   str2 = "abcd";
   prints(str1);
@@ -19,7 +25,6 @@ int main() {
   } else {
       print(21);
   }
-    ###
   if (x > y) {
       z = x - y;
       print(z);
