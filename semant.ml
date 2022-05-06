@@ -25,14 +25,83 @@ let check (globals, functions) =
   (* Make sure no globals duplicate *)
   check_binds "global" globals;
 
+  (*
+  let built_in_decls = 
+    let add_bind map (name, ty) = StringMap.add name {
+       ftyp = Void; 
+       fname = name; 
+       fformals = [(ty, "x")]; 
+       flocals = []; 
+       fbody = [] 
+       } map 
+    in List.fold_left add_bind StringMap.empty [ ("print", Int); 
+                                                ("printb", Bool); 
+                                                ("printf", Float); 
+                                                ("printbig", Int); 
+                                                ("prints", String); 
+                                                ("printc", Char) ] 
+  in 
+  let built_in_decls = 
+    let add_bind map (name, ty1, ty2, fty) = StringMap.add name { 
+      ftyp = fty; 
+      fname = name; 
+      fformals = [(ty1, "x"); (ty2, "x")]; 
+      flocals = []; 
+      fbody = [] } map 
+    in List.fold_left add_bind built_in_decls [ ("min", Int, Int, Int); 
+                                                ("max", Int, Int, Int); 
+                                                ("strcpy", String, String, String); 
+                                                ("strcat", String, String, String); 
+                                                ("strstr", String, String, String); 
+                                                ("strcmp", String, String, Bool); 
+                                                ("str_concat", String, String, String)] 
+            let add_bind map (name, ty, fty) = StringMap.add name 
+            { ftyp = fty; 
+            fname = name; 
+            fformals = [(ty, "x")]; 
+            flocals = []; 
+            fbody = [] } map 
+          in List.fold_left add_bind built_in_decls [ ("sin", Float, Float); ("cos", Float, Float); ("tan", Float, Float); ("sinh", Float, Float); ("cosh", Float, Float); ("tanh", Float, Float); ("exp", Float, Float); ("log", Float, Float); ("sqrt", Float, Float); ("strlen", String, Int) ] in let built_in_decls = let add_bind map (name, fty) = StringMap.add name { ftyp = fty; fname = name; fformals = []; flocals = []; fbody = [] } map in List.fold_left add_bind built_in_decls [ ("rand", Float)]*)
+
   (* Collect function declarations for built-in functions: no bodies *)
-  let built_in_decls =
+  (* let built_in_decls =
     StringMap.add "print" {
       rtyp = Int;
       fname = "print";
       formals = [(Int, "x")];
-      locals = []; body = [] } StringMap.empty
-  in
+      locals = []; 
+      body = [] } StringMap.empty
+  in *)
+  let built_in_decls = 
+    let add_bind map (name, ty) = StringMap.add name {
+       rtyp = None; 
+       fname = name; 
+       formals = [(ty, "x")]; 
+       locals = []; 
+       body = [] 
+       } map 
+    in List.fold_left add_bind StringMap.empty [ ("print", Int); 
+                                                ("printb", Bool); 
+                                                ("printf", Float); 
+                                                ("printbig", Int); 
+                                                ("prints", String); 
+                                                ("printc", Char) ] 
+  in 
+  let built_in_decls = 
+    let add_bind map (name, ty1, ty2, fty) = StringMap.add name { 
+      rtyp = fty; 
+      fname = name; 
+      formals = [(ty1, "x"); (ty2, "x")]; 
+      locals = []; 
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls [ ("min", Int, Int, Int); 
+                                                ("max", Int, Int, Int); 
+                                                ("strcpy", String, String, String); 
+                                                ("strcat", String, String, String); 
+                                                ("strstr", String, String, String); 
+                                                ("strcmp", String, String, Int); 
+                                                ("str_concat", String, String, String)]
+  in                                              
 
   (* Add function name to symbol table *)
   let add_func map fd =
@@ -149,16 +218,10 @@ let check (globals, functions) =
                       Int -> Bool 
                     | Float -> Bool 
                     | List(ty, len) -> if ty = Int || ty = Bool then List(ty, len) else raise(Failure err))
-            | And | Or -> Bool
+            | And | Or -> (match t1 with 
+                      Bool -> Bool
+                    | _ -> raise(Failure "Semant Error: Cannot compare two non-bool expressions."))
             | _ -> raise (Failure err)
-              (* Add | Sub | Times | Divide | Modulo when t1 = Int -> Int
-            | Add | Sub | Times | Divide | Modulo when t1 = Float -> Float
-            | Equal | Neq -> Bool
-            | Less | Greater | Leq | Geq when t1 = Int -> Bool
-            | Less | Greater | Leq | Geq when t1 = Float -> Bool *)
-            (* | In when t1 = 
-            | And | Or when t1 = Bool -> Bool
-            | _ -> raise (Failure err) *)
           in
           (t, SBinop((t1, e1'), op, (t2, e2')))
         else raise (Failure err)

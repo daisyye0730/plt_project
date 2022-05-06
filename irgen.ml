@@ -59,6 +59,10 @@ let translate (globals, functions) =
     L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func : L.llvalue =
     L.declare_function "printf" printf_t the_module in
+  let strcmp_t : L.lltype = 
+    L.function_type i32_t [| str_t; str_t |] in
+  let strcmp_func : L.llvalue = 
+    L.declare_function "strcmp" strcmp_t the_module in
 
   (* Define each function (arguments and return type) so we can
      call it even before we've created its body *)
@@ -119,24 +123,57 @@ let translate (globals, functions) =
       | SBinop (e1, op, e2) ->
         let e1' = build_expr builder e1
         and e2' = build_expr builder e2 in
+        let t1 = fst e1 and t2 = fst e2 in 
+        if t1 = A.Float && t2 = A.Float then 
+          (match op with
+            A.Add     -> L.build_fadd
+          | A.Sub     -> L.build_fsub
+          | A.Times   -> L.build_fmul
+          | A.Divide  -> L.build_fdiv
+          | A.Modulo  -> L.build_frem
+          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+          | A.Neq     -> L.build_fcmp L.Fcmp.One
+          | A.Less    -> L.build_fcmp L.Fcmp.Olt
+          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
+          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+          | _         -> raise(Failure "semant error in CodeGen: invalid Float Binop")
+        ) e1' e2' "tmp" builder
+        else if t1 = A.Int && t2 = A.Int then
         (match op with
            A.Add     -> L.build_add
          | A.Sub     -> L.build_sub
          | A.Times   -> L.build_mul
          | A.Divide  -> L.build_sdiv
          | A.Modulo  -> L.build_srem
-         | A.And     -> L.build_and
-         | A.Or      -> L.build_or
          | A.Equal   -> L.build_icmp L.Icmp.Eq
          | A.Neq     -> L.build_icmp L.Icmp.Ne
          | A.Less    -> L.build_icmp L.Icmp.Slt
          | A.Greater -> L.build_icmp L.Icmp.Sgt
          | A.Leq     -> L.build_icmp L.Icmp.Sle
          | A.Geq     -> L.build_icmp L.Icmp.Sge
+         | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
         ) e1' e2' "tmp" builder
+        else if t1 = A.Bool && t2 = A.Bool then 
+          (match op with 
+            A.And -> L.build_and
+          | A.Or  -> L.build_or
+          | A.Equal -> L.build_icmp L.Icmp.Eq
+          | A.Neq -> L.build_icmp L.Icmp.Ne
+          | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
+        ) e1' e2' "tmp" builder
+        (* else if t1 = A.String && t2 = A.String then (* compare pointers when it comes to string comparisons *)
+          (match op with 
+            A.Equal -> L.build_icmp L.Icmp.Eq 
+          | A.Neq -> L.build_icmp L.Icmp.Ne ) e1' e2' "tmp" builder *)
+        else raise (Failure ("CodeGen match failed in Binop."))
+
       | SCall ("print", [e]) ->
         L.build_call printf_func [| int_format_str ; (build_expr builder e) |]
           "printf" builder
+      | SCall ("strcmp", [e1; e2]) -> 
+        L.build_call strcmp_func  [| (build_expr builder e1); (build_expr builder e2) |] 
+          "strcmp" builder
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in

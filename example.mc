@@ -5,9 +5,20 @@ int main() {
   int x;
   int y;
   int z;
- ###
+  string str1;
+  string str2;
+  bool val;
+ 
   x = 2;
   y = 5;
+  str1 = "abcd";
+  str2 = "abcd";
+  if (strcmp(str1, str2) == 0) {
+      print(1);
+  } else {
+      print(21);
+  }
+    ###
   if (x > y) {
       z = x - y;
       print(z);
@@ -44,9 +55,7 @@ int main() {
 
       }
   }
-###
-  for (z within x) {
-      print(z);
-  }
+  ###
+
   return 0;
 }
