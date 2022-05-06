@@ -13,6 +13,7 @@ int main() {
   y = 5;
   str1 = "abcd";
   str2 = "abcd";
+  prints(str1);
   if (strcmp(str1, str2) == 0) {
       print(1);
   } else {

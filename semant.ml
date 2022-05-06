@@ -81,11 +81,10 @@ let check (globals, functions) =
        body = [] 
        } map 
     in List.fold_left add_bind StringMap.empty [ ("print", Int); 
-                                                ("printb", Bool); 
-                                                ("printf", Float); 
-                                                ("printbig", Int); 
-                                                ("prints", String); 
-                                                ("printc", Char) ] 
+                                                 ("printb", Bool); 
+                                                 ("printf", Float); 
+                                                 ("prints", String); 
+                                                 ("printc", Char) ] 
   in 
   let built_in_decls = 
     let add_bind map (name, ty1, ty2, fty) = StringMap.add name { 

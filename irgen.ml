@@ -80,7 +80,12 @@ let translate (globals, functions) =
     let (the_function, _) = StringMap.find fdecl.sfname function_decls in
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder in
+    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder 
+    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder
+    and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
+    and char_format_str = L.build_global_stringptr "%c\n" "fmt" builder
+    and bool_format_str = L.build_global_stringptr "%d\n" "fmt" builder
+    in
 
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
@@ -178,6 +183,15 @@ let translate (globals, functions) =
       | SCall ("strcmp", [e1; e2]) -> 
         L.build_call strcmp_func  [| (build_expr builder e1); (build_expr builder e2) |] 
           "strcmp" builder
+      | SCall ("printb", [e]) -> 
+        L.build_call printf_func [| bool_format_str ; (build_expr builder e) |]
+          "printb" builder
+      | SCall ("printf", [e]) -> L.build_call printf_func [| float_format_str ; (build_expr builder e) |] 
+          "printf" builder
+      | SCall ("printc", [e]) -> L.build_call printf_func [| char_format_str ; (build_expr builder e) |] 
+          "prints" builder
+      | SCall ("prints", [e]) -> L.build_call printf_func [| string_format_str ; (build_expr builder e) |] 
+          "prints" builder
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
         let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
