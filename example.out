@@ -13,6 +13,7 @@ source_filename = "dinosaur"
 @STRINGLITERAL.6 = private unnamed_addr constant [3 x i8] c"hi\00", align 1
 @STRINGLITERAL.7 = private unnamed_addr constant [10 x i8] c"not happy\00", align 1
 @STRINGLITERAL.8 = private unnamed_addr constant [6 x i8] c"third\00", align 1
+@STRINGLITERAL.9 = private unnamed_addr constant [4 x i8] c"bye\00", align 1
 
 declare i32 @printf(i8*, ...)
 
@@ -35,20 +36,22 @@ entry:
   store i8* getelementptr inbounds ([10 x i8], [10 x i8]* @STRINGLITERAL.7, i32 0, i32 0), i8** %storeLiIndex1, align 8
   %storeLiIndex2 = getelementptr inbounds i8*, i8** %new_li, i32 2
   store i8* getelementptr inbounds ([6 x i8], [6 x i8]* @STRINGLITERAL.8, i32 0, i32 0), i8** %storeLiIndex2, align 8
-  %storeLiIndex3 = getelementptr inbounds i8*, i8** %new_li, i32 0
-  %new_li4 = load i8*, i8** %storeLiIndex3, align 8
-  store i8* %new_li4, i8** %str1, align 8
-  %str15 = load i8*, i8** %str1, align 8
-  %prints = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str15)
-  %storeLiIndex6 = getelementptr inbounds i8*, i8** %new_li, i32 1
-  %new_li7 = load i8*, i8** %storeLiIndex6, align 8
-  store i8* %new_li7, i8** %str2, align 8
-  %str28 = load i8*, i8** %str2, align 8
-  %prints9 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str28)
-  %storeLiIndex10 = getelementptr inbounds i8*, i8** %new_li, i32 2
-  %new_li11 = load i8*, i8** %storeLiIndex10, align 8
-  store i8* %new_li11, i8** %str3, align 8
-  %str312 = load i8*, i8** %str3, align 8
-  %prints13 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str312)
+  %storeLiIndex3 = getelementptr inbounds i8*, i8** %new_li, i32 2
+  store i8* getelementptr inbounds ([4 x i8], [4 x i8]* @STRINGLITERAL.9, i32 0, i32 0), i8** %storeLiIndex3, align 8
+  %storeLiIndex4 = getelementptr inbounds i8*, i8** %new_li, i32 0
+  %new_li5 = load i8*, i8** %storeLiIndex4, align 8
+  store i8* %new_li5, i8** %str1, align 8
+  %str16 = load i8*, i8** %str1, align 8
+  %prints = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str16)
+  %storeLiIndex7 = getelementptr inbounds i8*, i8** %new_li, i32 1
+  %new_li8 = load i8*, i8** %storeLiIndex7, align 8
+  store i8* %new_li8, i8** %str2, align 8
+  %str29 = load i8*, i8** %str2, align 8
+  %prints10 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str29)
+  %storeLiIndex11 = getelementptr inbounds i8*, i8** %new_li, i32 2
+  %new_li12 = load i8*, i8** %storeLiIndex11, align 8
+  store i8* %new_li12, i8** %str3, align 8
+  %str313 = load i8*, i8** %str3, align 8
+  %prints14 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @fmt.2, i32 0, i32 0), i8* %str313)
   ret i32 0
 }

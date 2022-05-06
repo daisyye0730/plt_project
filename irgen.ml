@@ -134,8 +134,15 @@ let translate (globals, functions) =
       | SAccess(id, idx) -> 
         let idx' = [|L.const_int i32_t idx|] in
         let addr' = L.build_in_bounds_gep (lookup id) idx' "storeLiIndex" builder in
-        [L.build_load addr' id builder]   
-
+        [L.build_load addr' id builder]
+      (* my_list[2] = 5; *)   
+      | SListAssign(e1, e2) -> 
+        (match e1 with 
+         (ty, SAccess(id, idx)) -> let idx' = [|L.const_int i32_t idx|] in
+         let addr' = L.build_in_bounds_gep (lookup id) idx' "storeLiIndex" builder in
+         let e_eval = List.hd (build_expr builder e2) in 
+         ignore(L.build_store e_eval addr' builder); [e_eval]
+        | _ -> raise(Failure("semant error in CodeGen: check ListAssign")))
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  

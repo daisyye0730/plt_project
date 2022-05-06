@@ -28,6 +28,7 @@ int main() {
   str2 = "bcd";
   x=5;
   new_li = ["hi", "not happy", "third"];
+  new_li[2] = "bye";
   str1 = new_li[0];
   prints(str1);
   str2 = new_li[1];
