@@ -130,11 +130,6 @@ let translate (globals, functions) =
       | SListLit lp -> List.fold_left (
           fun li e -> let e' = List.hd (build_expr builder e) in e'::li
         ) [] lp
-      | SCall (f, args) ->
-        let (fdef, fdecl) = StringMap.find f function_decls in
-        let llargs = List.rev (List.map (fun e -> List.hd(build_expr builder e)) (List.rev args)) in
-        let result = f ^ "_result" in
-        [L.build_call fdef (Array.of_list llargs) result builder]
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  
@@ -143,178 +138,85 @@ let translate (globals, functions) =
                 fun r ele -> 
                     let li = (fst r) and idx = (snd r) in 
                     let idx' = [|L.const_int i32_t idx|] in
-                    let addr' = L.build_in_bounds_gep (lookup s) idx' "storeArrIdx" builder in
+                    let addr' = L.build_in_bounds_gep (lookup s) idx' "storeLiIndex" builder in
                     ignore(L.build_store ele addr' builder); (ele::li, idx+1))
                 ([], index) (build_expr builder e)
               in final
           | _ -> let e' = List.hd (build_expr builder e) in
             ignore(L.build_store e' (lookup s) builder); [e'])
-      (* | SCall ("print", [e]) ->
+
+      | SBinop (e1, op, e2) ->
+        let e1' = List.hd (build_expr builder e1)
+        and e2' = List.hd (build_expr builder e2) in
+        let t1 = fst e1 and t2 = fst e2 in 
+        if t1 = A.Float && t2 = A.Float then 
+          [(match op with
+            A.Add     -> L.build_fadd
+          | A.Sub     -> L.build_fsub
+          | A.Times   -> L.build_fmul
+          | A.Divide  -> L.build_fdiv
+          | A.Modulo  -> L.build_frem
+          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
+          | A.Neq     -> L.build_fcmp L.Fcmp.One
+          | A.Less    -> L.build_fcmp L.Fcmp.Olt
+          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
+          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
+          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+          | _         -> raise(Failure "semant error in CodeGen: invalid Float Binop")
+        ) e1' e2' "tmp" builder]
+        else if t1 = A.Int && t2 = A.Int then
+        [(match op with
+            A.Add     -> L.build_add
+          | A.Sub     -> L.build_sub
+          | A.Times   -> L.build_mul
+          | A.Divide  -> L.build_sdiv
+          | A.Modulo  -> L.build_srem
+          | A.Equal   -> L.build_icmp L.Icmp.Eq
+          | A.Neq     -> L.build_icmp L.Icmp.Ne
+          | A.Less    -> L.build_icmp L.Icmp.Slt
+          | A.Greater -> L.build_icmp L.Icmp.Sgt
+          | A.Leq     -> L.build_icmp L.Icmp.Sle
+          | A.Geq     -> L.build_icmp L.Icmp.Sge
+          | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
+        ) e1' e2' "tmp" builder]
+        else if t1 = A.Bool && t2 = A.Bool then 
+          [(match op with 
+            A.And -> L.build_and
+          | A.Or  -> L.build_or
+          | A.Equal -> L.build_icmp L.Icmp.Eq
+          | A.Neq -> L.build_icmp L.Icmp.Ne
+          | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
+        ) e1' e2' "tmp" builder]
+        else if t1 = A.String && t2 = A.String then
+        [(match op with 
+          | A.Sub     -> L.build_call strcmp_func
+          | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
+        ) [| e1';e2' |]  "tmp" builder] 
+        else raise (Failure ("CodeGen match failed in Binop."))
+      | SCall ("print", [e]) ->
         [L.build_call printf_func [| int_format_str ; List.hd (build_expr builder e) |]
-          "printf" builder] *)
-      (*
-      | SBinop (e1, op, e2) ->
-        let e1' = build_expr builder e1
-        and e2' = build_expr builder e2 in
-        let t1 = fst e1 and t2 = fst e2 in 
-        if t1 = A.Float && t2 = A.Float then 
-          (match op with
-            A.Add     -> L.build_fadd
-          | A.Sub     -> L.build_fsub
-          | A.Times   -> L.build_fmul
-          | A.Divide  -> L.build_fdiv
-          | A.Modulo  -> L.build_frem
-          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-          | A.Neq     -> L.build_fcmp L.Fcmp.One
-          | A.Less    -> L.build_fcmp L.Fcmp.Olt
-          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
-          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-          | _         -> raise(Failure "semant error in CodeGen: invalid Float Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.Int && t2 = A.Int then
-        (match op with
-           A.Add     -> L.build_add
-         | A.Sub     -> L.build_sub
-         | A.Times   -> L.build_mul
-         | A.Divide  -> L.build_sdiv
-         | A.Modulo  -> L.build_srem
-         | A.Equal   -> L.build_icmp L.Icmp.Eq
-         | A.Neq     -> L.build_icmp L.Icmp.Ne
-         | A.Less    -> L.build_icmp L.Icmp.Slt
-         | A.Greater -> L.build_icmp L.Icmp.Sgt
-         | A.Leq     -> L.build_icmp L.Icmp.Sle
-         | A.Geq     -> L.build_icmp L.Icmp.Sge
-         | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.Bool && t2 = A.Bool then 
-          (match op with 
-            A.And -> L.build_and
-          | A.Or  -> L.build_or
-          | A.Equal -> L.build_icmp L.Icmp.Eq
-          | A.Neq -> L.build_icmp L.Icmp.Ne
-          | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.String && t2 = A.String then
-        (match op with 
-          | A.Sub     -> L.build_call strcmp_func
-          | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
-        ) [| e1';e2' |]  "tmp" builder 
-        else raise (Failure ("CodeGen match failed in Binop."))
-
-      | SCall ("print", [e]) ->
-        L.build_call printf_func [| int_format_str ; build_expr builder e |]
-          "printf" builder
+          "printf" builder]
       | SCall ("strcmp", [e1; e2]) -> 
-        L.build_call strcmp_func  [| build_expr builder e1; build_expr builder e2 |]
-          "strcmp" builder
+        [L.build_call strcmp_func  [| List.hd (build_expr builder e1); List.hd (build_expr builder e2) |]
+          "strcmp" builder]
       | SCall ("printb", [e]) -> 
-        L.build_call printf_func [| bool_format_str ; build_expr builder e |]
-          "printb" builder
+        [L.build_call printf_func [| bool_format_str ; List.hd (build_expr builder e) |]
+          "printb" builder]
       | SCall ("printf", [e]) -> 
-        L.build_call printf_func [| float_format_str ; build_expr builder e |] 
-          "printf" builder
+        [L.build_call printf_func [| float_format_str ; List.hd (build_expr builder e) |] 
+          "printf" builder]
       | SCall ("printc", [e]) -> 
-        L.build_call printf_func [| char_format_str ; build_expr builder e |] 
-          "prints" builder
+        [L.build_call printf_func [| char_format_str ; List.hd (build_expr builder e) |] 
+          "prints" builder]
       | SCall ("prints", [e]) -> 
-        L.build_call printf_func [| string_format_str ; build_expr builder e |] 
-          "prints" builder
+        [L.build_call printf_func [| string_format_str ; List.hd (build_expr builder e) |] 
+          "prints" builder]
       | SCall (f, args) ->
         let (fdef, fdecl) = StringMap.find f function_decls in
-        let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
+        let llargs = List.rev (List.map (fun e -> List.hd(build_expr builder e)) (List.rev args)) in
         let result = f ^ "_result" in
-        L.build_call fdef (Array.of_list llargs) result builder *)
+        [L.build_call fdef (Array.of_list llargs) result builder]
     in 
-
-
-    (* Construct code for an expression; return its value
-    let rec build_expr builder ((_, e) : sexpr) = match e with
-        SInt_Literal(i)       -> L.const_int i32_t i
-      | SFloat_Literal(f)     -> L.const_float_of_string float_t f
-      | SChar_Literal(c)      -> L.const_int i8_t (Char.code c)
-      | SString_Literal(str)  -> L.build_global_stringptr str "STRINGLITERAL" builder
-      | SBoolLit b            -> L.const_int i1_t (if b then 1 else 0)
-      | SId s                 -> L.build_load (lookup s) s builder
-      | SListLit lp -> let li = List.fold_left (
-          fun li e -> let e' = build_expr builder e in e'::li
-        ) [] lp in
-         List.hd li
-      | SAssign (s, e) -> let e' = build_expr builder e in
-        ignore(L.build_store e' (lookup s) builder); e'
-      | SBinop (e1, op, e2) ->
-        let e1' = build_expr builder e1
-        and e2' = build_expr builder e2 in
-        let t1 = fst e1 and t2 = fst e2 in 
-        if t1 = A.Float && t2 = A.Float then 
-          (match op with
-            A.Add     -> L.build_fadd
-          | A.Sub     -> L.build_fsub
-          | A.Times   -> L.build_fmul
-          | A.Divide  -> L.build_fdiv
-          | A.Modulo  -> L.build_frem
-          | A.Equal   -> L.build_fcmp L.Fcmp.Oeq
-          | A.Neq     -> L.build_fcmp L.Fcmp.One
-          | A.Less    -> L.build_fcmp L.Fcmp.Olt
-          | A.Greater -> L.build_fcmp L.Fcmp.Ogt
-          | A.Leq     -> L.build_fcmp L.Fcmp.Ole
-          | A.Geq     -> L.build_fcmp L.Fcmp.Oge
-          | _         -> raise(Failure "semant error in CodeGen: invalid Float Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.Int && t2 = A.Int then
-        (match op with
-           A.Add     -> L.build_add
-         | A.Sub     -> L.build_sub
-         | A.Times   -> L.build_mul
-         | A.Divide  -> L.build_sdiv
-         | A.Modulo  -> L.build_srem
-         | A.Equal   -> L.build_icmp L.Icmp.Eq
-         | A.Neq     -> L.build_icmp L.Icmp.Ne
-         | A.Less    -> L.build_icmp L.Icmp.Slt
-         | A.Greater -> L.build_icmp L.Icmp.Sgt
-         | A.Leq     -> L.build_icmp L.Icmp.Sle
-         | A.Geq     -> L.build_icmp L.Icmp.Sge
-         | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.Bool && t2 = A.Bool then 
-          (match op with 
-            A.And -> L.build_and
-          | A.Or  -> L.build_or
-          | A.Equal -> L.build_icmp L.Icmp.Eq
-          | A.Neq -> L.build_icmp L.Icmp.Ne
-          | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
-        ) e1' e2' "tmp" builder
-        else if t1 = A.String && t2 = A.String then
-        (match op with 
-          | A.Sub     -> L.build_call strcmp_func
-          | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
-        ) [| e1';e2' |]  "tmp" builder 
-        else raise (Failure ("CodeGen match failed in Binop."))
-
-      | SCall ("print", [e]) ->
-        L.build_call printf_func [| int_format_str ; build_expr builder e |]
-          "printf" builder
-      | SCall ("strcmp", [e1; e2]) -> 
-        L.build_call strcmp_func  [| build_expr builder e1; build_expr builder e2 |]
-          "strcmp" builder
-      | SCall ("printb", [e]) -> 
-        L.build_call printf_func [| bool_format_str ; build_expr builder e |]
-          "printb" builder
-      | SCall ("printf", [e]) -> 
-        L.build_call printf_func [| float_format_str ; build_expr builder e |] 
-          "printf" builder
-      | SCall ("printc", [e]) -> 
-        L.build_call printf_func [| char_format_str ; build_expr builder e |] 
-          "prints" builder
-      | SCall ("prints", [e]) -> 
-        L.build_call printf_func [| string_format_str ; build_expr builder e |] 
-          "prints" builder
-      | SCall (f, args) ->
-        let (fdef, fdecl) = StringMap.find f function_decls in
-        let llargs = List.rev (List.map (build_expr builder) (List.rev args)) in
-        let result = f ^ "_result" in
-        L.build_call fdef (Array.of_list llargs) result builder
-    in *)
 
     let add_terminal builder instr =
       match L.block_terminator (L.insertion_block builder) with
@@ -326,7 +228,7 @@ let translate (globals, functions) =
        after the one generated by this call) *)
     let rec build_stmt (builder, break_bb, continue_bb) = function
         SBlock sl -> List.fold_left build_stmt (builder, break_bb, continue_bb) sl
-      | SExpr e -> ignore(build_expr builder e); (builder, break_bb, continue_bb)
+      | SExpr e -> ignore(List.hd (build_expr builder e)); (builder, break_bb, continue_bb)
       (* unconditional jump to break bb *)
       | SBreak -> ignore(add_terminal builder (L.build_br break_bb)); 
         let builder = L.builder_at_end context break_bb in (builder, break_bb, continue_bb)

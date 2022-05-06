@@ -84,7 +84,7 @@ let check (globals, functions) =
                                                  ("printb", Bool); 
                                                  ("printf", Float); 
                                                  ("prints", String); 
-                                                 ("printc", Char) ] 
+                                                 ("printc", Char)] 
   in 
   let built_in_decls = 
     let add_bind map (name, ty1, ty2, fty) = StringMap.add name { 

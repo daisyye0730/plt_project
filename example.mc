@@ -1,8 +1,28 @@
 int a;
 int b;
 
+int gcd(int a, int b) {
+  while (a != b) {
+    if (b < a) {
+      a = a - b; }
+    elif (b == a) {
+      a = a + b;
+    }
+    (elif (b < a) {
+      a = a * b;
+    })
+    else {b = b - a;}
+  }
+  print(a);
+  return a;
+}
+
 int main() {
   int x;
+  string str1;
+  string str2;
+  int val;
+  List(string, 2) new_li;
 ###
   int y;
   int z;
@@ -10,9 +30,12 @@ int main() {
   string str2;
   bool val;
 ###
-  List(string, 2) new_li;
-  x = 5;
+  str1 = "abc";
+  str2 = "bcd";
+  prints(str1);
+  x=5;
   new_li = ["hi", "not happy"];
+  gcd(x, x);
 
   ###
   str1 = "abcd";
@@ -60,6 +83,5 @@ int main() {
       }
   }
   ###
-
   return 0;
 }
