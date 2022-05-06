@@ -143,6 +143,32 @@ let translate (globals, functions) =
          let e_eval = List.hd (build_expr builder e2) in 
          ignore(L.build_store e_eval addr' builder); [e_eval]
         | _ -> raise(Failure("semant error in CodeGen: check ListAssign")))
+      (* mylist[3: 5]*)
+      | SSlice(id, idx_start, idx_end) -> 
+        (* let idx_start' = [|L.const_int i32_t idx_start|] 
+          and idx_end' = [|L.const_int i32_t idx_end|] 
+        (* let addr_start' = L.build_in_bounds_gep (lookup id) idx_start' "storeLiIndex" builder  *)
+          and addr_end' = L.build_in_bounds_gep (lookup id) idx_end' "storeLiIndex" builder  *)
+      (* in *)
+        let final = [] in
+        let rec match_fun (r, curr_idx) = 
+          (if curr_idx = idx_end then r 
+          else 
+            let addr = 
+              L.build_in_bounds_gep (lookup id) [|L.const_int i32_t curr_idx|] "storeLiIndex" builder 
+            in 
+            let res = L.build_load addr id builder in
+            match_fun(res::r, curr_idx+1))
+        in match_fun(final, idx_start) 
+        (* let rec match_fun (res, curr_index) = 
+        (function 
+        | (r, idx_end) -> (r, idx_end)
+        | (r, curr_idx) -> let addr = 
+              L.build_in_bounds_gep (lookup id) [|L.const_int i32_t curr_idx|] "storeLiIndex" builder 
+              in 
+              let res = L.build_load addr id builder in
+              let ans = match_fun(res::r, curr_idx+1) in ans
+        | _ -> raise(Failure ("invalid"))) *)
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  
@@ -176,6 +202,7 @@ let translate (globals, functions) =
           | A.Geq     -> L.build_fcmp L.Fcmp.Oge
           | _         -> raise(Failure "semant error in CodeGen: invalid Float Binop")
         ) e1' e2' "tmp" builder]
+
         else if t1 = A.Int && t2 = A.Int then
         [(match op with
             A.Add     -> L.build_add
@@ -191,6 +218,7 @@ let translate (globals, functions) =
           | A.Geq     -> L.build_icmp L.Icmp.Sge
           | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
         ) e1' e2' "tmp" builder]
+
         else if t1 = A.Bool && t2 = A.Bool then 
           [(match op with 
             A.And -> L.build_and
@@ -199,11 +227,21 @@ let translate (globals, functions) =
           | A.Neq -> L.build_icmp L.Icmp.Ne
           | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
         ) e1' e2' "tmp" builder]
+
         else if t1 = A.String && t2 = A.String then
         [(match op with 
           | A.Sub     -> L.build_call strcmp_func
           | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
         ) [| e1';e2' |]  "tmp" builder] 
+
+        (* else if t1 = A.ListLit(ty, len) then 
+          [(match ty with 
+            A.Bool -> 
+          | A.Int -> 
+          | A.Float -> 
+          | _ -> raise(Failure("CodeGen cannot complete list operation in String datatype. "))
+          ) e1' e2' "tmp" builder] *)
+
         else raise (Failure ("CodeGen match failed in Binop."))
       | SCall ("print", [e]) ->
         [L.build_call printf_func [| int_format_str ; List.hd (build_expr builder e) |]

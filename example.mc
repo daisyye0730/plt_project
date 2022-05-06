@@ -18,23 +18,20 @@ int gcd(int a, int b) {
 }
 ###
 int main() {
-  int x;
-  string str1;
-  string str2;
-  string str3;
-  int val;
-  List(string, 3) new_li;
-  str1 = "abc";
-  str2 = "bcd";
-  x=5;
-  new_li = ["hi", "not happy", "third"];
-  new_li[2] = "bye";
-  str1 = new_li[0];
-  prints(str1);
-  str2 = new_li[1];
-  prints(str2);
-  str3 = new_li[2];
-  prints(str3);
+  List(int, 3) new_li;
+  List(int, 2) sub_li;
+  int i;
+  int dummy;
+  
+  new_li = [1, 2, 3];
+  sub_li = new_li[1:3];
+
+  dummy = sub_li[1];
+  if (dummy == 3) {
+      prints("correct");
+  } else {
+
+  }
 
   ###
   str1 = "abcd";
