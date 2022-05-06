@@ -8,6 +8,8 @@ source_filename = "dinosaur"
 @fmt.2 = private unnamed_addr constant [4 x i8] c"%s\0A\00", align 1
 @fmt.3 = private unnamed_addr constant [4 x i8] c"%c\0A\00", align 1
 @fmt.4 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@STRINGLITERAL = private unnamed_addr constant [3 x i8] c"hi\00", align 1
+@STRINGLITERAL.5 = private unnamed_addr constant [10 x i8] c"not happy\00", align 1
 
 declare i32 @printf(i8*, ...)
 
@@ -16,14 +18,11 @@ declare i32 @strcmp(i8*, i8*)
 define i32 @main() {
 entry:
   %x = alloca i32, align 4
-  %y = alloca i32, align 4
-  %z = alloca i32, align 4
-  %str1 = alloca i8*, align 8
-  %str2 = alloca i8*, align 8
-  %val = alloca i1, align 1
-  %new_li = alloca [2 x i32], align 4
-  store i32 2, i32* %x, align 4
-  store i32 5, i32* %y, align 4
-  store i32 3, [2 x i32]* %new_li, align 4
+  %new_li = alloca i8*, i32 2, align 8
+  store i32 5, i32* %x, align 4
+  %storeArrIdx = getelementptr inbounds i8*, i8** %new_li, i32 0
+  store i8* getelementptr inbounds ([10 x i8], [10 x i8]* @STRINGLITERAL.5, i32 0, i32 0), i8** %storeArrIdx, align 8
+  %storeArrIdx1 = getelementptr inbounds i8*, i8** %new_li, i32 1
+  store i8* getelementptr inbounds ([3 x i8], [3 x i8]* @STRINGLITERAL, i32 0, i32 0), i8** %storeArrIdx1, align 8
   ret i32 0
 }

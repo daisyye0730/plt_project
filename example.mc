@@ -3,18 +3,16 @@ int b;
 
 int main() {
   int x;
+###
   int y;
   int z;
   string str1;
   string str2;
   bool val;
-  List(int, 2) new_li;
- 
-  x = 2;
-  y = 5;
-  
-  new_li = [2, 3];
-
+###
+  List(string, 2) new_li;
+  x = 5;
+  new_li = ["hi", "not happy"];
 
   ###
   str1 = "abcd";
