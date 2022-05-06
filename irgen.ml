@@ -154,6 +154,7 @@ let translate (globals, functions) =
          | A.Geq     -> L.build_icmp L.Icmp.Sge
          | _         -> raise(Failure "semant error in CodeGen: invalid Int Binop")
         ) e1' e2' "tmp" builder
+
         else if t1 = A.Bool && t2 = A.Bool then 
           (match op with 
             A.And -> L.build_and
@@ -162,10 +163,13 @@ let translate (globals, functions) =
           | A.Neq -> L.build_icmp L.Icmp.Ne
           | _ -> raise(Failure "semant error in CodeGen: invalid Bool Binop")
         ) e1' e2' "tmp" builder
-        (* else if t1 = A.String && t2 = A.String then (* compare pointers when it comes to string comparisons *)
-          (match op with 
-            A.Equal -> L.build_icmp L.Icmp.Eq 
-          | A.Neq -> L.build_icmp L.Icmp.Ne ) e1' e2' "tmp" builder *)
+
+        else if t1 = A.String && t2 = A.String then
+        (match op with 
+          | A.Sub     -> L.build_call strcmp_func
+          | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
+        ) [| e1'; e2' |]  "tmp" builder 
+
         else raise (Failure ("CodeGen match failed in Binop."))
 
       | SCall ("print", [e]) ->

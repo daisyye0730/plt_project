@@ -211,6 +211,7 @@ let check (globals, functions) =
               Add | Sub | Times | Divide | Modulo -> (match t1 with
                       Int -> Int 
                     | Float -> Float 
+                    | String -> Int
                     (* cannot add/sub/times/divide/mod non-int and non-float lists *)
                     | List(ty, len) -> if ty = Int || ty = Float then List(ty, len) else raise(Failure err))
             | Equal | Neq -> Bool
