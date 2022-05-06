@@ -1,6 +1,6 @@
 int a;
 int b;
-
+###
 int gcd(int a, int b) {
   while (a != b) {
     if (b < a) {
@@ -16,26 +16,24 @@ int gcd(int a, int b) {
   print(a);
   return a;
 }
-
+###
 int main() {
   int x;
   string str1;
   string str2;
+  string str3;
   int val;
-  List(string, 2) new_li;
-###
-  int y;
-  int z;
-  string str1;
-  string str2;
-  bool val;
-###
+  List(string, 3) new_li;
   str1 = "abc";
   str2 = "bcd";
-  prints(str1);
   x=5;
-  new_li = ["hi", "not happy"];
-  gcd(x, x);
+  new_li = ["hi", "not happy", "third"];
+  str1 = new_li[0];
+  prints(str1);
+  str2 = new_li[1];
+  prints(str2);
+  str3 = new_li[2];
+  prints(str3);
 
   ###
   str1 = "abcd";

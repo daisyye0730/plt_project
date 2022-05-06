@@ -130,6 +130,12 @@ let translate (globals, functions) =
       | SListLit lp -> List.fold_left (
           fun li e -> let e' = List.hd (build_expr builder e) in e'::li
         ) [] lp
+      (* li[2]; *)
+      | SAccess(id, idx) -> 
+        let idx' = [|L.const_int i32_t idx|] in
+        let addr' = L.build_in_bounds_gep (lookup id) idx' "storeLiIndex" builder in
+        [L.build_load addr' id builder]   
+
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  
@@ -140,11 +146,10 @@ let translate (globals, functions) =
                     let idx' = [|L.const_int i32_t idx|] in
                     let addr' = L.build_in_bounds_gep (lookup s) idx' "storeLiIndex" builder in
                     ignore(L.build_store ele addr' builder); (ele::li, idx+1))
-                ([], index) (build_expr builder e)
+                ([], index) (List.rev (build_expr builder e))
               in final
           | _ -> let e' = List.hd (build_expr builder e) in
             ignore(L.build_store e' (lookup s) builder); [e'])
-
       | SBinop (e1, op, e2) ->
         let e1' = List.hd (build_expr builder e1)
         and e2' = List.hd (build_expr builder e2) in
