@@ -145,11 +145,6 @@ let translate (globals, functions) =
         | _ -> raise(Failure("semant error in CodeGen: check ListAssign")))
       (* mylist[3: 5]*)
       | SSlice(id, idx_start, idx_end) -> 
-        (* let idx_start' = [|L.const_int i32_t idx_start|] 
-          and idx_end' = [|L.const_int i32_t idx_end|] 
-        (* let addr_start' = L.build_in_bounds_gep (lookup id) idx_start' "storeLiIndex" builder  *)
-          and addr_end' = L.build_in_bounds_gep (lookup id) idx_end' "storeLiIndex" builder  *)
-      (* in *)
         let final = [] in
         let rec match_fun (r, curr_idx) = 
           (if curr_idx = idx_end then r 
@@ -160,15 +155,6 @@ let translate (globals, functions) =
             let res = L.build_load addr id builder in
             match_fun(res::r, curr_idx+1))
         in match_fun(final, idx_start) 
-        (* let rec match_fun (res, curr_index) = 
-        (function 
-        | (r, idx_end) -> (r, idx_end)
-        | (r, curr_idx) -> let addr = 
-              L.build_in_bounds_gep (lookup id) [|L.const_int i32_t curr_idx|] "storeLiIndex" builder 
-              in 
-              let res = L.build_load addr id builder in
-              let ans = match_fun(res::r, curr_idx+1) in ans
-        | _ -> raise(Failure ("invalid"))) *)
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  
