@@ -155,6 +155,7 @@ let translate (globals, functions) =
             let res = L.build_load addr id builder in
             match_fun(res::r, curr_idx+1))
         in match_fun(final, idx_start) 
+
       | SAssign (s, e) -> 
           (match ty with
             A.List(t, len) ->  
@@ -220,7 +221,20 @@ let translate (globals, functions) =
           | _ -> raise(Failure "semant error in CodeGen: invalid string Binop")
         ) [| e1';e2' |]  "tmp" builder] 
 
-        (* else if t1 = A.ListLit(ty, len) then 
+        (* else if t1 = A.ListLit(ty, len) && t2 = A.ListLit(ty, len) then 
+          match (e1, e2) with 
+         (ty1, SAccess(id1, )) *  (ty, SAccess(id, idx))-> let idx' = [|L.const_int i32_t idx|] in
+        let final = [] in
+        let rec match_fun (r, curr_idx) = 
+          (if curr_idx = len then r 
+          else 
+            let addr = 
+              L.build_in_bounds_gep (lookup id) [|L.const_int i32_t curr_idx|] "storeLiIndex" builder 
+            in 
+            let res = L.build_load addr id builder in
+            match_fun(res::r, curr_idx+1))
+        in match_fun(final, idx_start) 
+
           [(match ty with 
             A.Bool -> 
           | A.Int -> 
