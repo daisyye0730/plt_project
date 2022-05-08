@@ -17,67 +17,25 @@ int gcd(int a, int b) {
   return a;
 }
 ###
+
 int main() {
   List(int, 3) new_li;
+  List(int, 3) old_li;
+  List(int, 3) r_li;
   List(int, 2) sub_li;
   int i;
   int dummy;
   
   new_li = [1, 2, 3];
+  old_li = [5, 4, 4];
   sub_li = new_li[1:3];
+  r_li = old_li - new_li;
 
-  dummy = sub_li[1];
-  if (dummy == 3) {
-      prints("correct");
-  } else {
+  print(r_li[0]);
 
-  }
+  print(r_li[1]);
 
-  ###
-  str1 = "abcd";
-  str2 = "abcd";
-  prints(str1);
-  if (strcmp(str1, str2) == 0) {
-      print(1);
-  } else {
-      print(21);
-  }
-  if (x > y) {
-      z = x - y;
-      print(z);
-  } elif (x < y) {
-      z = y - x;
-      print(z);
-  } (elif ((x-1) > y) {
-      z = y - x;
-      print(z);
-  }) (elif ((x+1)< y) {
-      z = 22;
-      print(z);
-  }) else {
-      z = 1;
-      print(z);
-  }
+  print(r_li[2]);
 
-  while (x < y) {
-      x ++;
-      if (x == y - 1) {
-          print(z);
-          break;
-      } else {
-
-      }
-      print(x);
-  }
-
-  for (x = 1; x < 5; x++) {
-      print(x);
-      if (x == 2) {
-        break;
-      } else {
-
-      }
-  }
-  ###
   return 0;
 }
