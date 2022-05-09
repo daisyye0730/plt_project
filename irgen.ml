@@ -147,14 +147,16 @@ let translate (globals, functions) =
           fun li e -> let e' = List.hd (build_expr builder e) in e'::li
         ) [] lp
       (* li[2]; *)
-      | SAccess(id, idx) -> 
-        let idx' = [|L.const_int i32_t idx|] in
+      | SAccess(id, e) -> 
+        let e' = build_expr builder e in
+        (* let idx' = [|L.const_int i32_t id|] in *)
+        let idx' = [|List.hd e'|] in 
         let addr' = L.build_in_bounds_gep (lookup id) idx' "storeLiIndex" builder in
         [L.build_load addr' id builder]
       (* my_list[2] = 5; *)   
       | SListAssign(e1, e2) -> 
         (match e1 with 
-         (ty, SAccess(id, idx)) -> let idx' = [|L.const_int i32_t idx|] in
+         (ty, SAccess(id, e3)) -> let idx' = [|List.hd (build_expr builder e3)|] in
          let addr' = L.build_in_bounds_gep (lookup id) idx' "storeLiIndex" builder in
          let e_eval = List.hd (build_expr builder e2) in 
          ignore(L.build_store e_eval addr' builder); [e_eval]

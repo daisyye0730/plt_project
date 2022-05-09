@@ -59,7 +59,7 @@ typ:
   | STRING { String } 
 
 list_index: 
-  | ID LBRACKET INT_LITERAL RBRACKET { Access($1, $3) } //myList[0]
+  | ID LBRACKET expr RBRACKET { Access($1, $3) } //myList[0]
 
 expr:
     INT_LITERAL      { Int_Literal($1)        }
@@ -90,7 +90,7 @@ expr:
   // | ID ASSIGN list_index { Assign($1, $3) } // x = mylist[2]
   | list_index ASSIGN expr { ListAssign($1, $3) } // mylist[3] = 5
   | ID LBRACKET INT_LITERAL COLON INT_LITERAL RBRACKET { Slice($1, $3, $5) } //mylist[3:5]
-  | ID LBRACKET INT_LITERAL RBRACKET { Access($1, $3)}
+  | ID LBRACKET expr RBRACKET { Access($1, $3)}
   /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
 

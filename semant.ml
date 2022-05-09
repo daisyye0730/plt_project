@@ -147,7 +147,7 @@ let check (globals, functions) =
     let rec check_assign lvaluet rvaluet e err =
       match lvaluet with 
       | List(t, len) -> (match e with
-        | SListLit l ->
+        | SListLit l -> 
           if t = rvaluet && len = List.length l then lvaluet else raise (Failure err)
         | SSlice(id, idx1, idx2) -> if (idx2-idx1) = len && lvaluet = rvaluet then rvaluet else raise (Failure err)
         | SBinop(e1, op, e2) -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
@@ -155,6 +155,14 @@ let check (globals, functions) =
       | _ -> if lvaluet = rvaluet then rvaluet else raise (Failure err)
     in
 
+    let rec check_list_access lvalue rvalue e err = 
+      match rvalue with
+      | Int ->
+        match lvalue with
+        | List(t, len) -> t
+        | _ -> raise (Failure err)
+      | _ -> raise (Failure err)
+    in
     (* Return a semantically-checked expression, i.e., with a type *)
     let rec check_expr = function
         Int_Literal l -> (Int, SInt_Literal l)
@@ -171,7 +179,13 @@ let check (globals, functions) =
                         Int li  
                       in (re, SListLit li)
       | Id var -> (type_of_identifier var, SId var)
-      | Access(id, idx) -> (check_access id idx, SAccess(id, idx))
+      | Access(id, e) as ex -> 
+        let lt = type_of_identifier id
+        and (rt, r2) = check_expr e in
+        let err = "illegal access " ^ string_of_typ lt ^ "[" ^
+          string_of_typ rt ^ "] in " ^ string_of_expr ex
+        in
+        (check_list_access lt rt r2 err, SAccess(id, (rt, r2)))
       | ListAssign(e1, e2) as ex -> 
         let (lt, r1) = check_expr e1 
         and (rt, r2) = check_expr e2 
@@ -239,12 +253,15 @@ let check (globals, functions) =
           in
           let args' = List.map2 check_call fd.formals args
           in (fd.rtyp, SCall(fname, args'))
-    and 
-    check_access id idx = 
+    (* and 
+    check_access id lt rt = 
       let id_type = type_of_identifier id 
         in match id_type with 
-        | List(ty, len) -> if idx >= len then raise(Failure("index out of range")) else ty
-        | _ -> raise(Failure("cannot access non-lists"))
+        | List(ty, len) -> 
+            if lt = Int then 
+              if rt >= len then raise(Failure("index out of range"))
+              else ty
+        | _ -> raise(Failure("cannot access non-lists")) *)
     in
 
     let check_bool_expr e =

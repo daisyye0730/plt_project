@@ -24,18 +24,20 @@ int main() {
   List(int, 3) r_li;
   List(int, 2) sub_li;
   int i;
+  int a;
+  int b;
   int dummy;
   
-  new_li = [1, 2, 3];
+  for(i=0; i<3; i++){
+    new_li[i] = i;
+  }
+
   old_li = [5, 4, 4];
-  sub_li = new_li[1:3];
   r_li = old_li - new_li;
 
-  print(r_li[0]);
-
-  print(r_li[1]);
-
-  print(r_li[2]);
+  for(i=0; i<3; i++){
+    print(r_li[i]);
+  }
 
   return 0;
 }
