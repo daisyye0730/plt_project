@@ -1,7 +1,7 @@
 int main() {
     List(int, 3) li1;
     List(int, 3) li2;
-    List(int, 3) sum;
+    List(int, 4) sum;
     int i;
 
     li1 = [2, 3, 4];
