@@ -6,7 +6,7 @@ import build
 # LLI location
 LLI = "lli"
 
-# test all files matching a given pattern - e.g. "tests/test-*.joel"
+# test all files matching a given pattern - e.g. "tests/test-*.dino"
 def test(files):
 	passes = 0
 	num_tests = len(files)
