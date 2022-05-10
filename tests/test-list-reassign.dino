@@ -1,0 +1,10 @@
+int main() {
+    List(int, 3) li;
+    int a;
+
+    a = -1;
+    li = [2, 3, 4];
+    li[1] = a;
+    print(li[1]);
+
+}

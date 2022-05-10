@@ -1,0 +1,4 @@
+int main() {
+    List(string, 4) li;
+    li = ["hello", "one", "two", "three"];
+}
