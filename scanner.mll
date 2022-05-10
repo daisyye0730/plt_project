@@ -63,9 +63,8 @@ rule token = parse
 | "None"   { NONE }
 (* Function *)
 | "return" { RETURN }
-| "def"    { DEF }
 (* Other *)
-| digit+ as lem  { INT_LITERAL(int_of_string lem) }
+| ['+' '-']?digit+ as lem  { INT_LITERAL(int_of_string lem) }
 | ['0'-'9']+('.'['0'-'9']+)? | '.'['0'-'9']+ as lxm  { FLOAT_LITERAL(lxm) }
 | char as lxm    { CHAR_LITERAL( String.get lxm 1 ) }
 | '"' ( (ascii | escape)* as s) '"'   { STRING_LITERAL(s) }

@@ -27,6 +27,11 @@ int main() {
   int a;
   int b;
   int dummy;
+
+  i = 5;
+  a = -3;
+  b = i - a;
+  print(b);
   
   for(i=0; i<3; i++){
     new_li[i] = i;
