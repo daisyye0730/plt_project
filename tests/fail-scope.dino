@@ -1,0 +1,12 @@
+int a;
+
+int echo() {
+    print(x);
+}
+
+int main() {
+    int x;
+    x = 10;
+    a = 5;
+    print(a);
+}

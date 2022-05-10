@@ -1,4 +1,5 @@
 int main() {
     List(string, 3) li;
     li = ["hello", "hell", "he"];
+    prints(li[0]);
 }

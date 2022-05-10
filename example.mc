@@ -1,7 +1,15 @@
 int main() {
-    List(int, 3) myli;
-    string a;
+    List(int, 3) li1;
+    List(int, 3) li2;
+    List(int, 3) sum;
+    int i;
 
-    myli = [2, 3, 4];
-    a = myli[2];
+    li1 = [2, 3, 4];
+    li2 = [-2, -3, -4];
+
+    sum = li1+li2;
+
+    for (i = 0; i < 3; i++) {
+      print(sum[i]);
+    }
 }

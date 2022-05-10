@@ -4,4 +4,5 @@ int main() {
 
     myli = [2, 3, 4];
     a = myli[2];
+    print(a);
 }

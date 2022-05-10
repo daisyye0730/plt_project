@@ -1,0 +1,7 @@
+int main() {
+    List(int, 3) li1;
+    List(int, 3) li2;
+    List(int, 3) sum;
+
+    sum = li1+li2;
+}
