@@ -1,13 +1,15 @@
-int a;
-a = 2 + 4;
-int b;
-b = 9 - 3;
-int c;
-c = a * b;
-int d;
-d = c / 6;
+int main() {
+    int a;
+    int b;
+    int c;
+    int d;
+    a = 2 + 4;
+    b = 9 - 3;
+    c = a * b;
+    d = c / 6;
 
-print(a);
-print(b);
-print(c);
-print(d);
+    print(a);
+    print(b);
+    print(c);
+    print(d);
+}

@@ -1,5 +1,5 @@
 int main() {
     List(bool, 2) bool_list;
     bool_list = [true, false];
-    printb(bool_list[0]);
+    printb(bool_list[1]);
 }

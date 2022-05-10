@@ -1,7 +1,7 @@
+string nothing(){
+    return "nothing";
+}
 int main() {
-    string nothing(){
-        return "nothing";
-    }
 
     prints(nothing());
 }
