@@ -1,0 +1,10 @@
+bool t = True;
+bool f = False;
+
+if(t or f){
+    print("or is true");
+}
+
+if(t and f){
+    print("and is not true);
+}
