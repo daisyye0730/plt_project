@@ -1,0 +1,1 @@
+Fatal error: exception Failure("illegal assignment List(string, 4) = string in li = [, hello, one, two ]")

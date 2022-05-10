@@ -25,53 +25,6 @@ let check (globals, functions) =
   (* Make sure no globals duplicate *)
   check_binds "global" globals;
 
-  (*
-  let built_in_decls = 
-    let add_bind map (name, ty) = StringMap.add name {
-       ftyp = Void; 
-       fname = name; 
-       fformals = [(ty, "x")]; 
-       flocals = []; 
-       fbody = [] 
-       } map 
-    in List.fold_left add_bind StringMap.empty [ ("print", Int); 
-                                                ("printb", Bool); 
-                                                ("printf", Float); 
-                                                ("printbig", Int); 
-                                                ("prints", String); 
-                                                ("printc", Char) ] 
-  in 
-  let built_in_decls = 
-    let add_bind map (name, ty1, ty2, fty) = StringMap.add name { 
-      ftyp = fty; 
-      fname = name; 
-      fformals = [(ty1, "x"); (ty2, "x")]; 
-      flocals = []; 
-      fbody = [] } map 
-    in List.fold_left add_bind built_in_decls [ ("min", Int, Int, Int); 
-                                                ("max", Int, Int, Int); 
-                                                ("strcpy", String, String, String); 
-                                                ("strcat", String, String, String); 
-                                                ("strstr", String, String, String); 
-                                                ("strcmp", String, String, Bool); 
-                                                ("str_concat", String, String, String)] 
-            let add_bind map (name, ty, fty) = StringMap.add name 
-            { ftyp = fty; 
-            fname = name; 
-            fformals = [(ty, "x")]; 
-            flocals = []; 
-            fbody = [] } map 
-          in List.fold_left add_bind built_in_decls [ ("sin", Float, Float); ("cos", Float, Float); ("tan", Float, Float); ("sinh", Float, Float); ("cosh", Float, Float); ("tanh", Float, Float); ("exp", Float, Float); ("log", Float, Float); ("sqrt", Float, Float); ("strlen", String, Int) ] in let built_in_decls = let add_bind map (name, fty) = StringMap.add name { ftyp = fty; fname = name; fformals = []; flocals = []; fbody = [] } map in List.fold_left add_bind built_in_decls [ ("rand", Float)]*)
-
-  (* Collect function declarations for built-in functions: no bodies *)
-  (* let built_in_decls =
-    StringMap.add "print" {
-      rtyp = Int;
-      fname = "print";
-      formals = [(Int, "x")];
-      locals = []; 
-      body = [] } StringMap.empty
-  in *)
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
        rtyp = None; 
@@ -158,9 +111,9 @@ let check (globals, functions) =
     let rec check_list_access lvalue rvalue e err = 
       match rvalue with
       | Int ->
-        match lvalue with
+        (match lvalue with
         | List(t, len) -> t
-        | _ -> raise (Failure err)
+        | _ -> raise (Failure err))
       | _ -> raise (Failure err)
     in
     (* Return a semantically-checked expression, i.e., with a type *)

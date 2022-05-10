@@ -1,0 +1,16 @@
+#this is because our elif requires () starting from the second elif
+
+int main() {
+    int a;
+    a = -2;
+    
+    if (a == 0) {
+        prints("wrong output");
+    } elif(a == -1) {
+        prints("wrong output");
+    } elif(a == -2) {
+        prints("wrong output");
+    } else {
+
+    }
+}

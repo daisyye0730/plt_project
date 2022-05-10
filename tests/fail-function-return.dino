@@ -1,0 +1,10 @@
+int gcd(int a, int b) {
+  return "hi";
+}
+
+int main() {
+    int a;
+    string str;
+    str = gcd(4, 5);
+    return 0;
+}

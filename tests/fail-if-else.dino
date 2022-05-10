@@ -1,0 +1,7 @@
+int main() {
+    else {
+      prints("incorrect");
+    } if(true) {
+      prints("correct");
+    } 
+}
