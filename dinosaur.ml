@@ -12,7 +12,7 @@
        ("-s", Arg.Unit (set_action Sast), "Print the SAST");
        ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
      ] in
-     let usage_msg = "usage: ./dinasour.native [-a|-s|-l] [file.mc]" in
+     let usage_msg = "usage: ./dinasaur.native [-a|-s|-l] [file.mc]" in
      let channel = ref stdin in
      Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
    
