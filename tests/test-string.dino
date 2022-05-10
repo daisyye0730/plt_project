@@ -1,0 +1,5 @@
+int main() {
+    string s;
+    s = "this is a string";
+    prints(s);
+}

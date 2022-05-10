@@ -1,0 +1,16 @@
+int main() {
+    int a;
+    a = 4;
+    if(a == 2){
+        prints("elif is wrong");
+    }
+    elif(a == 3){
+        prints("elif is wrong");
+    }
+    (elif(a == 4){
+        prints("elif is right!");
+    })
+    else{
+        prints("elif is wrong");
+    }
+}
