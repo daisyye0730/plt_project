@@ -1,10 +1,22 @@
-bool t = True;
-bool f = False;
+int main() {
 
-if(t or f){
-    print("or is true");
-}
+  bool t;
+  bool f;
 
-if(t and f){
-    print("and is not true);
+  t = true;
+  f = false;
+
+  if(t or f){
+    prints("or is true");
+  } else {
+
+  }
+
+  if(t and f){
+    prints("and is not true");
+  } else {
+    
+  }
+
+  return 0;
 }
