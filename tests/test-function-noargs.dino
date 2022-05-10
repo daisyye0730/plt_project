@@ -1,0 +1,7 @@
+int main() {
+    string nothing(){
+        return "nothing";
+    }
+
+    prints(nothing());
+}

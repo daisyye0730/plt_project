@@ -1,0 +1,9 @@
+int main() {
+    bool a;
+    a = true;
+    if(a){
+        prints("if is right!");
+    } else {
+        prints("if is wrong!");
+    }
+}

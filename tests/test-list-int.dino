@@ -1,1 +1,7 @@
-List(
+int main() {
+    List(int, 3) int_list;
+    int_list = [1, 2, 3];
+    print(int_list[0]);
+    int_list[0] = 5;
+    print(int_list[0]);
+}
