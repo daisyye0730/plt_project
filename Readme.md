@@ -1,5 +1,7 @@
 # DINOSAUR
 
+> A collaborative team project.
+
 A compiler for a statically-typed, C-like programming language called **Dinosaur** (`.dino`), written in OCaml and targeting LLVM IR. The language supports primitive types, first-class fixed-size lists, control flow with `elif` chains, and user-defined functions — all with full static type checking before code generation.
 
 ## Language Features
